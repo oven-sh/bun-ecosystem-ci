@@ -1,0 +1,67 @@
+/repos
+
+# Logs
+logs
+_.log
+*.log
+npm-debug.log_
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Caches
+.cache
+
+# Code Coverage 
+
+lib-cov
+coverage
+*.lcov
+.nyc_output
+
+# Dependencies
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+# Output of 'npm pack'
+*.tgz 
+
+# Lint caches
+.eslintcache
+.stylelintcache
+
+# dotenv environment variable files
+
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Temporary files
+.temp
+/tmp
+/temp
+*.tmp
+*.temp
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.yarn-integrity
+
+# Editor files. VSCode settings are committed.
+.idea
+*.swp
+*.swo
+
+# Finder (MacOS) folder config
+.DS_Store

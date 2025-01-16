@@ -1,0 +1,21 @@
+{
+  "name": "ecosystem-ci",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun src/index.ts",
+    "lint": "oxlint",
+    "lint:fix": "bun run lint --fix",
+    "format": "prettier -w **/*.{ts,tsx,md}",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxlint": "^0.15.6",
+    "prettier": "^3.4.2"
+  }
+}
