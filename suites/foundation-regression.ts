@@ -37,9 +37,14 @@ const packages: Record<string, Package> = {
     minipass: {
         repository: 'https://github.com/isaacs/minipass',
     },
+    express: {
+        repository: 'https://github.com/expressjs/express',
+        ref: 'master',
+        test: 'bun --bun mocha --require test/support/env --reporter spec --check-leaks test/ test/acceptance/'
+    },
 }
 
-export default function foundationRegression({ isLocal }: Context): TestSuite {
+export default function foundationRegression(): TestSuite {
     const defaultTestStep = `bun run test`
 
     const cases = Object.entries(packages).reduce(
@@ -64,11 +69,15 @@ export default function foundationRegression({ isLocal }: Context): TestSuite {
                 Step.from(`
                     if [ -d ${packageName} ]; then
                         cd ${packageName}
-                        git checkout ${ref} --force
+                        git reset --hard ${ref}
                     else
                         git clone ${repository} --branch ${ref} --depth 1 --no-tags ${packageName}
                     fi
                     `),
+                Step.from(`echo "[run]\nbun=true" > bunfig.toml`, {
+                    name: 'create bunfig',
+                    cwd: packageName,
+                }),
                 Step.from(`bun install`, { cwd: packageName }),
                 Step.from(testStep, { cwd: packageName }),
             ])
@@ -81,7 +90,7 @@ export default function foundationRegression({ isLocal }: Context): TestSuite {
 
     return {
         cases,
-        beforeAll({ isLocal }) {
+        beforeAll({ isLocal }: Context) {
             if (isLocal) {
                 try {
                     fs.mkdirSync('repos', { recursive: true })
@@ -91,6 +100,6 @@ export default function foundationRegression({ isLocal }: Context): TestSuite {
                 }
                 process.chdir('repos')
             }
-        }
+        },
     }
 }

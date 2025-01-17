@@ -55,15 +55,19 @@ export interface Step {
     cwd?: string
 }
 export namespace Step {
-    export function from(command: string | string[], rest: Partial<Omit<Step, 'run'>> = {}): Step {
+    export function from(
+        command: string | string[],
+        rest: Partial<Omit<Step, 'run'>> = {}
+    ): Step {
         return {
             name: rest.name,
             run: Array.isArray(command)
                 ? command
-                : command.trim()
-                    .split('\n')
-                    .map(s => s.trim())
-                    .filter(Boolean),
+                : command
+                      .trim()
+                      .split('\n')
+                      .map(s => s.trim())
+                      .filter(Boolean),
             env: rest.env,
             cwd: rest.cwd,
         }

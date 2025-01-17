@@ -1,9 +1,9 @@
 import assert from 'assert'
 import type { Context, TestCase } from '../lib'
 import suites from '../suites'
-import { pick } from './util';
+import { pick } from './util'
 
-const inheritEnvVarNames = ['PATH', 'CI', 'TTY', 'BUN_DEBUG_QUIET_LOGS'];
+const inheritEnvVarNames = ['PATH', 'CI', 'TTY', 'BUN_DEBUG_QUIET_LOGS', 'TERM']
 
 for (const [key, createSuite] of Object.entries(suites)) {
     const localContext: Context = {
@@ -30,14 +30,14 @@ for (const [key, createSuite] of Object.entries(suites)) {
 
 async function runCase(testCase: TestCase): Promise<number> {
     for (const step of testCase.steps) {
-        const { run, env: stepEnv, cwd } = step
+        const { run, env: stepEnv, cwd, name } = step
         const env = Object.assign(
             pick(process.env, inheritEnvVarNames),
             testCase.env,
             stepEnv
         )
         assert(run.length > 0, 'Step must have at least one command')
-        console.log(`$ ${run[0]}`)
+        console.log('Step: ' + (name || `$ ${run[0]}`))
         const child = Bun.spawn(['bash'], {
             stdio: ['pipe', 'ignore', 'inherit'],
             cwd,
@@ -46,13 +46,14 @@ async function runCase(testCase: TestCase): Promise<number> {
         for (const cmd of run) {
             child.stdin.write(cmd + '\n')
         }
-        child.stdin.end();
+        child.stdin.end()
 
         const code = await child.exited
         if (code !== 0) {
             return code
         }
     }
+    console.log(`${testCase.name} ran successfully`)
 
     return 0
 }

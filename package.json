@@ -6,7 +6,7 @@
     "start": "bun src/index.ts",
     "lint": "oxlint",
     "lint:fix": "bun run lint --fix",
-    "format": "prettier -w **/*.{ts,tsx,md}",
+    "format": "prettier -w **/*.{ts,md}",
     "check": "tsc --noEmit"
   },
   "dependencies": {},
