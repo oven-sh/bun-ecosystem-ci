@@ -39,7 +39,7 @@ async function runCase(testCase: TestCase): Promise<number> {
         assert(run.length > 0, 'Step must have at least one command')
         console.log('Step: ' + (name || `$ ${run[0]}`))
         const child = Bun.spawn(['bash'], {
-            stdio: ['pipe', 'ignore', 'inherit'],
+            stdio: ['pipe', 'inherit', 'inherit'],
             cwd,
             env,
         })
