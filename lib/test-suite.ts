@@ -10,11 +10,16 @@
  *
  */
 export interface Context {
+    /**
+     * Are we running tests locally or in CI?
+     */
     isLocal: boolean
+    /** Name of bun binary. Use this instead of hardcoding `'bun'` into steps. */
+    bun: string
 }
 export type EcosystemSuite =
     | TestSuite
-    | ((context: Context) => TestSuite | Promise<TestSuite>)
+    | ((context: Readonly<Context>) => TestSuite | Promise<TestSuite>)
 
 export interface TestSuite {
     name?: string

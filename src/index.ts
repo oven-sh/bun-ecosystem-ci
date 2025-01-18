@@ -5,10 +5,12 @@ import { pick } from './util'
 
 const inheritEnvVarNames = ['PATH', 'CI', 'TTY', 'BUN_DEBUG_QUIET_LOGS', 'TERM']
 
+const cwd = process.cwd()
 for (const [key, createSuite] of Object.entries(suites)) {
-    const localContext: Context = {
+    const localContext: Context = Object.freeze({
         isLocal: true,
-    }
+        bun: 'bun',
+    })
 
     const suite =
         typeof createSuite === 'function'
@@ -25,6 +27,7 @@ for (const [key, createSuite] of Object.entries(suites)) {
         }
     } finally {
         await suite.afterAll?.(localContext)
+        process.chdir(cwd)
     }
 }
 

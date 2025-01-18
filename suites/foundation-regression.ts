@@ -19,13 +19,10 @@ export default installAndTest({
     express: {
         repository: 'https://github.com/expressjs/express',
         ref: 'master',
+        test: 'test test/*.js',
         preload: [
             import.meta.require.resolve('@shim/mocha'),
-            './test/support/env.js'
-        ]
+            './test/support/env.js',
+        ],
     },
-    // zeromq: {
-    //     repository: 'https://github.com/zeromq/zeromq.js',
-
-    // }
 })

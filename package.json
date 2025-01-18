@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "s": "bun src/index.ts",
     "start": "bun src/index.ts",
     "lint": "oxlint",
     "lint:fix": "bun run lint --fix",
