@@ -23,6 +23,10 @@ export default installAndTest({
         preload: [
             import.meta.require.resolve('@shim/mocha'),
             './test/support/env.js',
-        ],
+        ], 
     },
+    elysia: {
+        repository: 'https://github.com/elysiajs/elysia.git',
+        postinstall: ({ bun }) => `${bun} run build`
+    }
 })

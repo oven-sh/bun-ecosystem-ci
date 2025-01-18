@@ -37,11 +37,14 @@ export interface TestCase {
      */
     env?: Record<string, string | undefined>
 }
+
+const falsey = <T>(value: T): value is Exclude<T, undefined | null | false | 0 | ""> => Boolean(value)
+
 export namespace TestCase {
-    export function from(name: string, steps: (string | Step)[]): TestCase {
+    export function from(name: string, steps: (string | Step | null | undefined)[]): TestCase {
         return {
             name,
-            steps: steps.map(step =>
+            steps: steps.filter(falsey).map(step =>
                 typeof step === 'string' ? Step.from(step) : step
             ),
             cwd: undefined,
@@ -61,18 +64,19 @@ export interface Step {
 }
 export namespace Step {
     export function from(
-        command: string | string[],
+        command: string | string[] | Step,
         rest: Partial<Omit<Step, 'run'>> = {}
     ): Step {
+        if (typeof command === 'object' && !Array.isArray(command)) return command
         return {
             name: rest.name,
             run: Array.isArray(command)
                 ? command
                 : command
-                      .trim()
-                      .split('\n')
-                      .map(s => s.trim())
-                      .filter(Boolean),
+                    .trim()
+                    .split('\n')
+                    .map(s => s.trim())
+                    .filter(Boolean),
             env: rest.env,
             cwd: rest.cwd,
         }

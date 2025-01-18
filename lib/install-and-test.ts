@@ -19,6 +19,7 @@ interface Package {
      * @default "run test"
      */
     test?: string | string[]
+    postinstall?: (ctx: Context) => string | Step,
     preload?: string | string[]
 }
 
@@ -33,13 +34,14 @@ interface Package {
 export function installAndTest(
     packages: Record<string, Package>
 ): EcosystemSuite {
-    return function doInstallAndTest({ bun }) {
+    return function doInstallAndTest(ctx) {
+        const { bun } = ctx;
         const defaultTestStep = `${bun} run test`
 
         const cases = Object.entries(packages).reduce(
             (
                 cases: TestCase[],
-                [packageName, { test, repository, ref = 'main', preload }]
+                [packageName, { test, repository, ref = 'main', preload, postinstall }]
             ) => {
                 let testStep: string = defaultTestStep
                 if (typeof test === 'string') {
@@ -76,12 +78,14 @@ export function installAndTest(
                     else
                         git clone ${repository} --branch ${ref} --depth 1 --no-tags ${packageName}
                     fi
-                    `),
+                    `, { name: `Checkout ${packageName} on ${ref}` }),
                     Step.from(`echo "${bunfig}" > bunfig.toml`, {
                         name: 'Create bunfig',
                         cwd: packageName,
                     }),
                     Step.from(`${bun} install`, { cwd: packageName }),
+                    postinstall && Step.from(postinstall(ctx)),
+
                     Step.from(testStep, { cwd: packageName }),
                 ])
 
