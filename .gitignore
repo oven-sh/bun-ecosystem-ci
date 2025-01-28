@@ -58,10 +58,11 @@ node_modules/
 .pnp.*
 .yarn-integrity
 
-# Editor files. VSCode settings are committed.
+# Editor files. VSCode files (except settings) are committed
 .idea
 *.swp
 *.swo
+.vscode/settings.json
 
 # Finder (MacOS) folder config
 .DS_Store

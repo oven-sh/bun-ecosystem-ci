@@ -7,10 +7,13 @@
     "start": "bun src/index.ts",
     "lint": "oxlint",
     "lint:fix": "bun run lint --fix",
+    "fmt": "prettier -w **/*.{ts,md}",
     "format": "prettier -w **/*.{ts,md}",
     "check": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "commander": "^13.1.0"
+  },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
