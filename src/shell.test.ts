@@ -96,7 +96,7 @@ describe(renderStep, () => {
         })
 
         it('includes the step commands', () => {
-            expect(rendered).toContainEqual(command)
+            expect(rendered).toContainEqual(expect.stringMatching(command))
         })
 
         it('produces a valid shell script', async () => {

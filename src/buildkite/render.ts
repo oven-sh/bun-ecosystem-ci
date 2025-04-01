@@ -1,7 +1,7 @@
 // import type { Pipeline } from "./types";
 import type { TestSuite, Step, Context, EcosystemSuite } from '../../lib'
 import { Pipeline } from '@buildkite/buildkite-sdk'
-import type { BlockStep, CommandStep, GroupStep, InputStep, PipelineStep, TriggerStep, WaitStep } from '@buildkite/buildkite-sdk'
+import type { CommandStep, GroupStep, WaitStep } from '@buildkite/buildkite-sdk'
 import { StringStep, type PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
 
 /**
@@ -65,5 +65,3 @@ function mapStep(step: Step) {
         ...cmd,
     } satisfies CommandStep
 }
-
-type StepCommon = CommandStep & GroupStep & BlockStep & WaitStep & InputStep & TriggerStep
