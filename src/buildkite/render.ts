@@ -30,15 +30,15 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
         .addStep(sequential)
 
     for (const testCase of testSuite.cases) {
-        pipeline
-            .addStep({
-                // https://buildkite.com/docs/pipelines/configure/step-types/group-step
-                group: testCase.name,
-                depends_on: ['install-bun'],
-                skip: testCase.skip,
-                steps: testCase.steps.flatMap(step => [mapStep(step) satisfies PurpleStep, StringStep.Wait]),
-            } satisfies GroupStep)
-            .addStep(sequential)
+        const group: GroupStep = {
+            // https://buildkite.com/docs/pipelines/configure/step-types/group-step
+            group: testCase.name,
+            depends_on: ['install-bun'],
+            // skip: testCase.skip,
+            steps: testCase.steps.flatMap(step => [mapStep(step) satisfies PurpleStep, StringStep.Wait]),
+        };
+        if (testCase.skip) group.skip = true
+        pipeline.addStep(group)
     }
 
     return pipeline
@@ -53,9 +53,9 @@ function mapStep(step: Step) {
         case 0:
             throw new Error('Step has no commands')
         case 1:
-            cmd.command = step.run[0]
+            cmd.command = step.run[0].replaceAll('\n', '\\n')
             break;
-        default: cmd.commands = step.run
+        default: cmd.commands = step.run.map(cmd => cmd.replaceAll('\n', '\\n'))
     }
 
     return {

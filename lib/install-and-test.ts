@@ -92,16 +92,17 @@ export function installAndTest(
                             preload.map(p => `\\"${p}\\"`).join(', ') +
                             ']\n'
                     } else {
-                        bunfig += `preload = \\"${preload}\\"`
+                        bunfig += `preload = \\"${preload}\\"\n`
                     }
                 }
+                bunfig = bunfig.replaceAll('\n', '\\n')
 
                 // const steps =
                 const testCase = TestCase.from(packageName, {
                     ...rest,
                     steps: [
-                        steps.checkout({ packageName, ref, repository }),
-                        Step.from(`echo "${bunfig}" > bunfig.toml`, {
+                        steps.checkout({ packageName, ref, repository, isLocal: ctx.isLocal }),
+                        Step.from(`printf "${bunfig}" > bunfig.toml`, {
                             name: 'Create bunfig',
                             cwd: packageName,
                             key: 'create-bunfig',

@@ -38,7 +38,8 @@ export default function main(argv: string[]): void {
         )
         .option(
             '-o, --output <output>',
-            'Output directory relative to cwd. Defaults to "."'
+            'Output directory relative to cwd',
+            'tmp'
         )
         .option(
             '-s, --suite <suite>',
@@ -53,7 +54,11 @@ export default function main(argv: string[]): void {
             if (suiteName) {
                 let suite = suites[suiteName]
                 if (!suite) {
-                    for (const testSuite of Object.values(suites)) {
+                    for (const ecosystemSuite of Object.values(suites)) {
+                        const testSuite = await TestSuite.reify(
+                            ecosystemSuite,
+                            { isLocal: false, bun }
+                        )
                         if (testSuite.name === suiteName) {
                             suite = testSuite
                             break
@@ -162,10 +167,6 @@ async function runAllTests({
             bun,
         })
 
-        // const suite =
-        //     typeof createSuite === 'function'
-        //         ? await createSuite(localContext)
-        //         : createSuite
         const suite = await TestSuite.reify(createSuite, localContext)
         suite.name ??= key
 
