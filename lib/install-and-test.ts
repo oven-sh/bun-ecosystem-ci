@@ -101,7 +101,12 @@ export function installAndTest(
                 const testCase = TestCase.from(packageName, {
                     ...rest,
                     steps: [
-                        steps.checkout({ packageName, ref, repository, isLocal: ctx.isLocal }),
+                        steps.checkout({
+                            packageName,
+                            ref,
+                            repository,
+                            isLocal: ctx.isLocal,
+                        }),
                         Step.from(`printf "${bunfig}" > bunfig.toml`, {
                             name: 'Create bunfig',
                             cwd: packageName,
