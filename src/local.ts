@@ -12,54 +12,67 @@ export default function main(argv: string[]): void {
         .option('-b, --bun <bun>', 'Path to bun executable', 'bun')
         .option('-t, --test <test>', 'Filter by test name pattern')
         .parse(argv)
-        .action(async function run(cmd) {
+        .action(async function run(cmd): Promise<void> {
             console.log('Running test suites')
             const cwd = process.cwd()
-            const { test: testFilter } = cmd
-            for (const [key, createSuite] of Object.entries(suites)) {
-                const localContext: Context = Object.freeze({
-                    isLocal: true,
-                    bun: cmd.bun,
-                })
+            const { test: testFilter, bun } = cmd
+            assert(bun, 'Bun executable cannot be empty.')
 
-                const suite =
-                    typeof createSuite === 'function'
-                        ? await createSuite(localContext)
-                        : createSuite
-                suite.name ??= key
+            await runAllTests({ cwd, bun, testFilter })
+        })
+}
 
-                console.log('Running suite:', suite.name)
-                try {
-                    await suite.beforeAll?.(localContext)
-                    for (const testCase of suite.cases) {
-                        if (testFilter && !testCase.name.includes(testFilter)) {
-                            continue
-                        }
-                        if (testCase.skip) {
-                            console.log('Skipping test case:', testCase.name)
-                            continue
-                        }
-                        console.log('Running test case:', testCase.name)
-                        await runCase(testCase)
-                    }
-                } finally {
-                    if (suite.afterAll) {
-                        try {
-                            await suite.afterAll(localContext)
-                        } catch (e) {
-                            const error = new Error(
-                                `Test suite ${suite.name} failed in afterAll`
-                            )
-                            error.cause = e
-                            console.error(e)
-                        }
-                    }
-                    process.chdir(cwd)
-                }
-            }
+interface Options {
+    cwd: string
+    bun: string
+    testFilter?: string
+}
+
+/**
+ * Local test runner.
+ */
+async function runAllTests({ cwd, bun, testFilter }: Options): Promise<void> {
+    for (const [key, createSuite] of Object.entries(suites)) {
+        const localContext: Readonly<Context> = Object.freeze({
+            isLocal: true,
+            bun,
         })
 
-    // program.parse(process.argv)
+        const suite =
+            typeof createSuite === 'function'
+                ? await createSuite(localContext)
+                : createSuite
+        suite.name ??= key
+
+        console.log('Running suite:', suite.name)
+        try {
+            await suite.beforeAll?.(localContext)
+            for (const testCase of suite.cases) {
+                if (testFilter && !testCase.name.includes(testFilter)) {
+                    continue
+                }
+                if (testCase.skip) {
+                    console.log('Skipping test case:', testCase.name)
+                    continue
+                }
+                console.log('Running test case:', testCase.name)
+                await runCase(testCase)
+            }
+        } finally {
+            if (suite.afterAll) {
+                try {
+                    await suite.afterAll(localContext)
+                } catch (e) {
+                    const error = new Error(
+                        `Test suite ${suite.name} failed in afterAll`
+                    )
+                    error.cause = e
+                    console.error(e)
+                }
+            }
+            process.chdir(cwd)
+        }
+    }
 }
 
 async function runCase(testCase: TestCase): Promise<number> {
