@@ -1,7 +1,12 @@
 import assert from 'assert'
 import path from 'path'
 import { Command } from 'commander'
-import { TestSuite, type Context, type EcosystemSuite, type TestCase } from '../lib'
+import {
+    TestSuite,
+    type Context,
+    type EcosystemSuite,
+    type TestCase,
+} from '../lib'
 import suites from '../suites'
 import { pick, toSnakeCase } from './util'
 import { createPipeline } from './buildkite/render'
@@ -31,8 +36,14 @@ export default function main(argv: string[]): void {
                 .choices(['buildkite', 'shell'])
                 .default('buildkite')
         )
-        .option('-o, --output <output>', 'Output directory relative to cwd. Defaults to "."')
-        .option('-s, --suite <suite>', 'Render a single suite. Defaults to all suites.')
+        .option(
+            '-o, --output <output>',
+            'Output directory relative to cwd. Defaults to "."'
+        )
+        .option(
+            '-s, --suite <suite>',
+            'Render a single suite. Defaults to all suites.'
+        )
         .action(async function render(cmd): Promise<void> {
             const { suite: suiteName, output, format, bun } = cmd
 
@@ -50,14 +61,23 @@ export default function main(argv: string[]): void {
                     }
                 }
                 if (!suite) program.error(`Unknown suite: ${suiteName}`)
-                await renderSuite(suite, { output: outdir, format, bun, suiteKey: suiteName })
+                await renderSuite(suite, {
+                    output: outdir,
+                    format,
+                    bun,
+                    suiteKey: suiteName,
+                })
             } else {
                 for (const [key, suite] of Object.entries(suites)) {
-                    renderSuite(suite, { suiteKey: key, output: outdir, format, bun })
+                    renderSuite(suite, {
+                        suiteKey: key,
+                        output: outdir,
+                        format,
+                        bun,
+                    })
                 }
             }
-
-        });
+        })
 
     program
         .command('test', { isDefault: true })
@@ -83,11 +103,17 @@ interface RenderOptions {
     bun: string
     suiteKey?: string
 }
-async function renderSuite(suite: EcosystemSuite, options: RenderOptions): Promise<void> {
-    const testSuite = await TestSuite.reify(suite, { isLocal: false, bun: options.bun })
+async function renderSuite(
+    suite: EcosystemSuite,
+    options: RenderOptions
+): Promise<void> {
+    const testSuite = await TestSuite.reify(suite, {
+        isLocal: false,
+        bun: options.bun,
+    })
     const name = testSuite.name || options.suiteKey
     assert(name)
-    let absoluteFilepath: string;
+    let absoluteFilepath: string
 
     switch (options.format) {
         case 'buildkite': {
@@ -95,12 +121,15 @@ async function renderSuite(suite: EcosystemSuite, options: RenderOptions): Promi
             absoluteFilepath = path.join(options.output, filename)
             const pipeline = await createPipeline(suite)
             await Bun.write(absoluteFilepath, pipeline.toYAML())
-            break;
+            break
         }
         case 'shell': {
             const filename = toSnakeCase(name) + '.sh'
             absoluteFilepath = path.join(options.output, filename)
-            const testSuite = typeof suite === 'function' ? await suite({ isLocal: false, bun: options.bun }) : suite
+            const testSuite =
+                typeof suite === 'function'
+                    ? await suite({ isLocal: false, bun: options.bun })
+                    : suite
             const script = renderSuiteAsBashScript(testSuite).join('\n')
             await Bun.write(absoluteFilepath, script)
             break
@@ -108,7 +137,9 @@ async function renderSuite(suite: EcosystemSuite, options: RenderOptions): Promi
         default:
             throw new TypeError(`Unknown CI format: ${options.format}`)
     }
-    console.log(`Saved pipeline to '${path.relative(process.cwd(), absoluteFilepath)}'`)
+    console.log(
+        `Saved pipeline to '${path.relative(process.cwd(), absoluteFilepath)}'`
+    )
 }
 
 interface RunTestOptions {
@@ -120,7 +151,11 @@ interface RunTestOptions {
 /**
  * Local test runner.
  */
-async function runAllTests({ cwd, bun, testFilter }: RunTestOptions): Promise<void> {
+async function runAllTests({
+    cwd,
+    bun,
+    testFilter,
+}: RunTestOptions): Promise<void> {
     for (const [key, createSuite] of Object.entries(suites)) {
         const localContext: Readonly<Context> = Object.freeze({
             isLocal: true,
