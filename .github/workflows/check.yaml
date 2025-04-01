@@ -10,7 +10,7 @@ on:
             - main
 
 env:
-    BUN_VERSION: 1.2.1
+    BUN_VERSION: 1.2.8
 
 jobs:
     lint:
