@@ -6,17 +6,18 @@ import type { Maybe } from './types'
  *
  * These types are designed to be mappable to both `bun test` and
  * buildkite.
- * - `TestSuite` -> workflow
- * - `TestCase` -> job
- * - `Step` -> step lol
- *
+ * - {@link TestSuite} -> workflow
+ * - {@link TestCase} -> job
+ * - {@link Step} -> step lol
  */
 export interface Context {
     /**
      * Are we running tests locally or in CI?
      */
     isLocal: boolean
-    /** Name of bun binary. Use this instead of hardcoding `'bun'` into steps. */
+    /**
+     * Name of bun binary. Use this instead of hardcoding `'bun'` into steps.
+     */
     bun: string
 }
 
@@ -27,14 +28,20 @@ export type EcosystemSuite =
 export interface TestSuite {
     name?: string
     cases: TestCase[]
-    beforeAll?: (context: Context) => void | Promise<void>
-    afterAll?: (context: Context) => void | Promise<void>
+    beforeAll?: (context: Readonly<Context>) => void | Promise<void>
+    afterAll?: (context: Readonly<Context>) => void | Promise<void>
 }
 
 export interface TestCase {
+    /**
+     * Display name of the test case.
+     */
     name: string
     steps: Step[]
     /**
+     * Default working directory for all {@link Step steps}. Steps may
+     * individually override this.
+     *
      * @default process.cwd()
      */
     cwd?: string
@@ -93,8 +100,8 @@ export namespace TestCase {
             failing = false,
             skip = false,
         } = Array.isArray(stepsOrOptions)
-            ? { steps: stepsOrOptions }
-            : stepsOrOptions
+                ? { steps: stepsOrOptions }
+                : stepsOrOptions
 
         return {
             name,
@@ -128,6 +135,9 @@ export interface Step {
      * Overrides existing values in {@link process.env} and {@link TestCase.env}
      */
     env?: Record<string, string | undefined>
+    /**
+     * Current working directory to use when running commands for this step.
+     */
     cwd?: string
 }
 export namespace Step {
@@ -144,10 +154,10 @@ export namespace Step {
             run: Array.isArray(command)
                 ? command
                 : command
-                      .trim()
-                      .split('\n')
-                      .map(s => s.trim())
-                      .filter(Boolean),
+                    .trim()
+                    .split('\n')
+                    .map(s => s.trim())
+                    .filter(Boolean),
             env: rest.env,
             cwd: rest.cwd,
         }

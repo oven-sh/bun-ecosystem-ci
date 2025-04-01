@@ -4,6 +4,7 @@
     "": {
       "name": "ecosystem-ci",
       "dependencies": {
+        "@buildkite/buildkite-sdk": "^0.2.0",
         "commander": "^13.1.0",
       },
       "devDependencies": {
@@ -17,6 +18,8 @@
     },
   },
   "packages": {
+    "@buildkite/buildkite-sdk": ["@buildkite/buildkite-sdk@0.2.0", "", { "dependencies": { "tslib": "^2.3.0", "yaml": "^2.6.1" } }, "sha512-vwyPd/HokZIzYT4283fFBoTPMmQPP6z82b92Yr/nl7rfh3iOgSPgQhDkdMdLiLEv7ZuSEbRKOyloMbZKromKyA=="],
+
     "@oxlint/darwin-arm64": ["@oxlint/darwin-arm64@0.15.6", "", { "os": "darwin", "cpu": "arm64" }, "sha512-Oyx21zpBMttAykoL3VSXM4ScfO0OygKAVFJlRFzh14CF4pnMQRcQ8fIH38BXy6wdE3YyZ9ml1ZspsCwguqb/3A=="],
 
     "@oxlint/darwin-x64": ["@oxlint/darwin-x64@0.15.6", "", { "os": "darwin", "cpu": "x64" }, "sha512-fNjxp7MBflKYyvvYgvjvAaCnVdYE3QZkscNhd8ygMko4yFErzPnvPong04QhvNN/cSxrL74nowMHrijPxZbm6Q=="],
@@ -47,8 +50,12 @@
 
     "prettier": ["prettier@3.4.2", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ=="],
 
+    "tslib": ["tslib@2.8.1", "", {}, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
+
     "typescript": ["typescript@5.7.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw=="],
 
     "undici-types": ["undici-types@5.26.5", "", {}, "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA=="],
+
+    "yaml": ["yaml@2.7.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ=="],
   }
 }
