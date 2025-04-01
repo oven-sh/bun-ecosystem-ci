@@ -1,7 +1,7 @@
 import assert from 'assert'
 import path from 'path'
 import { Command } from 'commander'
-import type { Context, EcosystemSuite, TestCase } from '../lib'
+import { TestSuite, type Context, type EcosystemSuite, type TestCase } from '../lib'
 import suites from '../suites'
 import { pick, toSnakeCase } from './util'
 import { createPipeline } from './buildkite/render'
@@ -40,7 +40,15 @@ export default function main(argv: string[]): void {
             const outdir = output ? path.resolve(output) : process.cwd()
 
             if (suiteName) {
-                const suite = suites[suiteName]
+                let suite = suites[suiteName]
+                if (!suite) {
+                    for (const testSuite of Object.values(suites)) {
+                        if (testSuite.name === suiteName) {
+                            suite = testSuite
+                            break
+                        }
+                    }
+                }
                 if (!suite) program.error(`Unknown suite: ${suiteName}`)
                 await renderSuite(suite, { output: outdir, format, bun, suiteKey: suiteName })
             } else {
@@ -76,8 +84,9 @@ interface RenderOptions {
     suiteKey?: string
 }
 async function renderSuite(suite: EcosystemSuite, options: RenderOptions): Promise<void> {
-    const name = suite.name || options.suiteKey
-    assert(name, 'Suite must have a name')
+    const testSuite = await TestSuite.reify(suite, { isLocal: false, bun: options.bun })
+    const name = testSuite.name || options.suiteKey
+    assert(name)
     let absoluteFilepath: string;
 
     switch (options.format) {
@@ -118,10 +127,11 @@ async function runAllTests({ cwd, bun, testFilter }: RunTestOptions): Promise<vo
             bun,
         })
 
-        const suite =
-            typeof createSuite === 'function'
-                ? await createSuite(localContext)
-                : createSuite
+        // const suite =
+        //     typeof createSuite === 'function'
+        //         ? await createSuite(localContext)
+        //         : createSuite
+        const suite = await TestSuite.reify(createSuite, localContext)
         suite.name ??= key
 
         console.log('Running suite:', suite.name)

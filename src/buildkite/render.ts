@@ -59,10 +59,10 @@ function mapStep(step: Step) {
     }
 
     return {
-        ...cmd,
+        label: step.name,
         key: step.key,
         env: step.env,
-        label: step.name,
+        ...cmd,
     } satisfies CommandStep
 }
 

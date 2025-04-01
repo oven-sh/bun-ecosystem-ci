@@ -31,6 +31,12 @@ export interface TestSuite {
     beforeAll?: (context: Readonly<Context>) => void | Promise<void>
     afterAll?: (context: Readonly<Context>) => void | Promise<void>
 }
+export namespace TestSuite {
+    export async function reify(suite: EcosystemSuite, context: Readonly<Context>): Promise<TestSuite> {
+        const testSuite = typeof suite === 'function' ? await suite(context) : suite
+        return testSuite
+    }
+}
 
 export interface TestCase {
     /**

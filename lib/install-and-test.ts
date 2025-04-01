@@ -46,6 +46,7 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
  * @param packages Packages to clone and test. Each one gets turned into a {@link TestCase}.
  */
 export function installAndTest(
+    name: string,
     packages: Record<string, Package>
 ): EcosystemSuite {
     return function doInstallAndTest(ctx) {
@@ -130,6 +131,7 @@ export function installAndTest(
         )
 
         return {
+            name,
             cases,
             async beforeAll({ isLocal }: Context) {
                 if (isLocal) {
