@@ -1,7 +1,8 @@
 // import type { Pipeline } from "./types";
-import type { TestSuite, TestCase, Step, Context, EcosystemSuite } from '../../lib'
+import type { TestSuite, Step, Context, EcosystemSuite } from '../../lib'
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { BlockStep, CommandStep, GroupStep, InputStep, PipelineStep, TriggerStep, WaitStep } from '@buildkite/buildkite-sdk'
+import { StringStep, type PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
 
 /**
  * Create a Buildkite {@link Pipeline} YAML file from a
@@ -31,9 +32,11 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
     for (const testCase of testSuite.cases) {
         pipeline
             .addStep({
+                // https://buildkite.com/docs/pipelines/configure/step-types/group-step
                 group: testCase.name,
                 depends_on: ['install-bun'],
                 skip: testCase.skip,
+                steps: testCase.steps.flatMap(step => [mapStep(step) satisfies PurpleStep, StringStep.Wait]),
             } satisfies GroupStep)
             .addStep(sequential)
     }
@@ -44,8 +47,8 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
 /**
  * @see [Defining Steps](https://buildkite.com/docs/pipelines/configure/defining-steps)
  */
-function mapStep(step: Step, overrides?: Partial<StepCommon>): PipelineStep {
-    let cmd: Partial<CommandStep> = {}
+function mapStep(step: Step) {
+    let cmd: Pick<CommandStep, 'command' | 'commands'> = {}
     switch (step.run.length) {
         case 0:
             throw new Error('Step has no commands')
@@ -57,9 +60,9 @@ function mapStep(step: Step, overrides?: Partial<StepCommon>): PipelineStep {
 
     return {
         ...cmd,
+        key: step.key,
         env: step.env,
         label: step.name,
-        ...overrides,
     } satisfies CommandStep
 }
 

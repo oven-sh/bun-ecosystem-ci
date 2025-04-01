@@ -103,12 +103,23 @@ export function installAndTest(
                         Step.from(`echo "${bunfig}" > bunfig.toml`, {
                             name: 'Create bunfig',
                             cwd: packageName,
+                            key: 'create-bunfig',
                         }),
-                        Step.from(`${bun} install`, { cwd: packageName }),
+                        Step.from(`${bun} install`, {
+                            cwd: packageName,
+                            key: 'install-deps',
+                        }),
                         postinstall &&
-                            Step.from(postinstall(ctx), { cwd: packageName }),
+                            Step.from(postinstall(ctx), {
+                                cwd: packageName,
+                                key: 'postinstall',
+                            }),
 
-                        Step.from(testStep, { cwd: packageName, env: testEnv }),
+                        Step.from(testStep, {
+                            cwd: packageName,
+                            env: testEnv,
+                            key: 'run-tests',
+                        }),
                     ],
                 })
 

@@ -1,5 +1,6 @@
 {
   "name": "ecosystem-ci",
+  "version": "0.0.1",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {

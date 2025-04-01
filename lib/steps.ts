@@ -18,5 +18,5 @@ else
     git clone ${repository} --branch ${ref} --depth 1 --no-tags ${packageName}
 fi
 `,
-        { name: `Checkout ${packageName}` }
+        { name: `Checkout ${packageName}`, key: `checkout-${packageName}` }
     )

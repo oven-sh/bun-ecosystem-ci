@@ -1,28 +1,108 @@
 import assert from 'assert'
+import path from 'path'
 import { Command } from 'commander'
-import type { Context, TestCase } from '../lib'
+import type { Context, EcosystemSuite, TestCase } from '../lib'
 import suites from '../suites'
-import { pick } from './util'
+import { pick, toSnakeCase } from './util'
+import { createPipeline } from './buildkite/render'
+import { renderSuite as renderSuiteAsBashScript } from './shell'
+import { version } from '../package.json'
 
 const inheritEnvVarNames = ['PATH', 'CI', 'TTY', 'BUN_DEBUG_QUIET_LOGS', 'TERM']
 
 export default function main(argv: string[]): void {
-    const program = new Command()
-    program //
-        .option('-b, --bun <bun>', 'Path to bun executable', 'bun')
+    const program = new Command().name('ecosystem-ci').version(version)
+
+    const bunOpt = program
+        .createOption('-b, --bun <bun>', 'Path to bun executable')
+        .default('bun')
+
+    program
+        .command('render')
+        .alias('r')
+        .description('Render a test suite into a CI pipeline')
+        .addOption(bunOpt)
+        .addOption(
+            program
+                .createOption(
+                    '-f, --format <format>',
+                    'Format to render the pipeline in'
+                )
+                .choices(['buildkite', 'shell'])
+                .default('buildkite')
+        )
+        .option('-o, --output <output>', 'Output directory relative to cwd. Defaults to "."')
+        .option('-s, --suite <suite>', 'Render a single suite. Defaults to all suites.')
+        .action(async function render(cmd): Promise<void> {
+            const { suite: suiteName, output, format, bun } = cmd
+
+            if (!bun) program.error('Bun executable cannot be empty.')
+            const outdir = output ? path.resolve(output) : process.cwd()
+
+            if (suiteName) {
+                const suite = suites[suiteName]
+                if (!suite) program.error(`Unknown suite: ${suiteName}`)
+                await renderSuite(suite, { output: outdir, format, bun, suiteKey: suiteName })
+            } else {
+                for (const [key, suite] of Object.entries(suites)) {
+                    renderSuite(suite, { suiteKey: key, output: outdir, format, bun })
+                }
+            }
+
+        });
+
+    program
+        .command('test', { isDefault: true })
+        .alias('t')
+        .description('Run test suites locally')
         .option('-t, --test <test>', 'Filter by test name pattern')
-        .parse(argv)
+        .addOption(bunOpt)
         .action(async function run(cmd): Promise<void> {
             console.log('Running test suites')
             const cwd = process.cwd()
             const { test: testFilter, bun } = cmd
-            assert(bun, 'Bun executable cannot be empty.')
+            if (!bun) program.error('Bun executable cannot be empty.')
 
             await runAllTests({ cwd, bun, testFilter })
         })
+
+    program.parse(argv)
 }
 
-interface Options {
+interface RenderOptions {
+    output: string
+    format: 'buildkite' | 'shell'
+    bun: string
+    suiteKey?: string
+}
+async function renderSuite(suite: EcosystemSuite, options: RenderOptions): Promise<void> {
+    const name = suite.name || options.suiteKey
+    assert(name, 'Suite must have a name')
+    let absoluteFilepath: string;
+
+    switch (options.format) {
+        case 'buildkite': {
+            const filename = toSnakeCase(name) + '.yml'
+            absoluteFilepath = path.join(options.output, filename)
+            const pipeline = await createPipeline(suite)
+            await Bun.write(absoluteFilepath, pipeline.toYAML())
+            break;
+        }
+        case 'shell': {
+            const filename = toSnakeCase(name) + '.sh'
+            absoluteFilepath = path.join(options.output, filename)
+            const testSuite = typeof suite === 'function' ? await suite({ isLocal: false, bun: options.bun }) : suite
+            const script = renderSuiteAsBashScript(testSuite).join('\n')
+            await Bun.write(absoluteFilepath, script)
+            break
+        }
+        default:
+            throw new TypeError(`Unknown CI format: ${options.format}`)
+    }
+    console.log(`Saved pipeline to '${path.relative(process.cwd(), absoluteFilepath)}'`)
+}
+
+interface RunTestOptions {
     cwd: string
     bun: string
     testFilter?: string
@@ -31,7 +111,7 @@ interface Options {
 /**
  * Local test runner.
  */
-async function runAllTests({ cwd, bun, testFilter }: Options): Promise<void> {
+async function runAllTests({ cwd, bun, testFilter }: RunTestOptions): Promise<void> {
     for (const [key, createSuite] of Object.entries(suites)) {
         const localContext: Readonly<Context> = Object.freeze({
             isLocal: true,

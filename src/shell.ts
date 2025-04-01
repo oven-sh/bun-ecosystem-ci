@@ -38,7 +38,7 @@ export function renderSuite(suite: TestSuite): string[] {
  * bash script.
  */
 export function renderTestCase(testCase: TestCase): string[] {
-    const { name, cwd, env, steps, skip } = testCase
+    const { name, cwd, steps, skip } = testCase
     assert(steps.length > 0, `Test case '${name}' has no steps`)
 
     let lines = [
@@ -83,7 +83,7 @@ export function renderStep(step: Step): string[] {
     return [
         `# Step: ${name ?? [run[0]]}`,
         name && `echo '${name?.replaceAll("'", "\\'")}'`,
-        ...subshell(lines),
+        ...subshell(indent(lines)),
     ].filter(Boolean) as string[]
 }
 
@@ -94,10 +94,13 @@ const wrap = (enter: string, exit: string) => (lines: Lines) => [
     ...reifyLines(lines),
     exit,
 ]
+
 /**
  * Comment out commands
  */
 const comment = (lines: Lines) => reifyLines(lines).map(line => `# ${line}`)
+const indent = (lines: Lines) => reifyLines(lines).map(line => INDENT + line)
+const INDENT = '  '
 
 /** Change directories for the duration of some commands */
 const withDir = (dir: string | undefined) =>

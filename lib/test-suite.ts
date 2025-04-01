@@ -124,6 +124,14 @@ export namespace TestCase {
 }
 
 export interface Step {
+    /**
+     * Unique identifier for the step. Should be in `kebab-case`.
+     * @example "install-bun"
+     */
+    key?: string
+    /**
+     * Human-friendly display name
+     */
     name?: string
     /**
      * Each line is a shell command to run
@@ -161,5 +169,19 @@ export namespace Step {
             env: rest.env,
             cwd: rest.cwd,
         }
+    }
+
+    /**
+     * @returns `true` if `value` is a {@link Step}
+     */
+    export function is(value: unknown): value is Step {
+        if (typeof value !== 'object' || !value) return false
+        if (!('run' in value) || !Array.isArray(value.run)) return false
+        if ('name' in value) {
+            const name = value.name
+            if (name !== undefined && typeof name !== 'string') return false
+        }
+
+        return true
     }
 }

@@ -1,9 +1,10 @@
 import { describe, beforeAll, it, expect } from 'bun:test'
 import os from 'node:os'
 import path from 'node:path'
-import { renderStep, renderTestCase, renderSuite } from './shell'
-import { Step, type Context } from '../lib'
+import { renderStep, renderSuite, renderTestCase } from './shell'
+import { Step, TestCase, type Context } from '../lib'
 import foundationRegression from '../suites/foundation-regression'
+import { AssertionError } from 'node:assert'
 
 const id = () => Math.round(Math.random() * 10_000).toString(16)
 const getTmpdir = (prefix: string) =>
@@ -31,7 +32,53 @@ beforeAll(async () => {
     }
 })
 
+describe(renderSuite, () => {
+    it('throws if no cases are provided', () => {
+        expect(() => renderSuite({ cases: [] })).toThrow(AssertionError)
+    })
+
+    describe("When the 'foundation regression' suite is rendered", () => {
+        let rendered: string[]
+        let tmpdir: string
+        const context: Readonly<Context> = Object.freeze({
+            isLocal: true,
+            bun: 'bun',
+        })
+
+        beforeAll(async () => {
+            tmpdir = getTmpdir('render-suite')
+            const suite =
+                typeof foundationRegression === 'function'
+                    ? await foundationRegression(context)
+                    : foundationRegression
+            rendered = renderSuite(suite)
+        })
+
+        it('produces a valid shell script', async () => {
+            expect(shellcheck).toBeTruthy()
+            const filename = path.join(tmpdir, 'basic-step.sh')
+            await Bun.write(filename, rendered.join('\n'))
+            const result = await Bun.spawn([shellcheck!, filename], {
+                stdout: 'inherit',
+            })
+            expect(await result.exited).toBe(0)
+        })
+    })
+})
+
+describe(renderTestCase, () => {
+    it('throws if no steps are provided', () => {
+        expect(() => renderTestCase(TestCase.from('test', []))).toThrow(
+            AssertionError
+        )
+    })
+})
+
 describe(renderStep, () => {
+    it('throws if no commands are provided', () => {
+        expect(() => renderStep({ run: [] })).toThrow(AssertionError)
+    })
+
     describe('When a basic step is rendered', () => {
         let rendered: string[]
         let tmpdir: string
@@ -58,36 +105,6 @@ describe(renderStep, () => {
             // steps are script fragments, not full scripts, so we need to add a
             // shebang. Otherwise shellcheck will complain
             await Bun.write(filename, '#!/bin/bash\n' + rendered.join('\n'))
-            const result = await Bun.spawn([shellcheck!, filename], {
-                stdout: 'inherit',
-            })
-            expect(await result.exited).toBe(0)
-        })
-    })
-})
-
-describe(renderSuite, () => {
-    describe("When the 'foundation regression' suite is rendered", () => {
-        let rendered: string[]
-        let tmpdir: string
-        const context: Readonly<Context> = Object.freeze({
-            isLocal: true,
-            bun: 'bun',
-        })
-
-        beforeAll(async () => {
-            tmpdir = getTmpdir('render-suite')
-            const suite =
-                typeof foundationRegression === 'function'
-                    ? await foundationRegression(context)
-                    : foundationRegression
-            rendered = renderSuite(suite)
-        })
-
-        it('produces a valid shell script', async () => {
-            expect(shellcheck).toBeTruthy()
-            const filename = path.join(tmpdir, 'basic-step.sh')
-            await Bun.write(filename, rendered.join('\n'))
             const result = await Bun.spawn([shellcheck!, filename], {
                 stdout: 'inherit',
             })
