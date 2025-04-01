@@ -100,8 +100,8 @@ export namespace TestCase {
             failing = false,
             skip = false,
         } = Array.isArray(stepsOrOptions)
-                ? { steps: stepsOrOptions }
-                : stepsOrOptions
+            ? { steps: stepsOrOptions }
+            : stepsOrOptions
 
         return {
             name,
@@ -154,10 +154,10 @@ export namespace Step {
             run: Array.isArray(command)
                 ? command
                 : command
-                    .trim()
-                    .split('\n')
-                    .map(s => s.trim())
-                    .filter(Boolean),
+                      .trim()
+                      .split('\n')
+                      .map(s => s.trim())
+                      .filter(Boolean),
             env: rest.env,
             cwd: rest.cwd,
         }

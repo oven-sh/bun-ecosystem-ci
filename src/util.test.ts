@@ -8,7 +8,6 @@ describe('pick', () => {
         expect(pick(obj, ['a', 'b'])).toEqual({ a: 1, b: 2 })
     })
 
-
     it('does not pick missing keys', () => {
         expect(pick(obj, ['a', 'd'] as any)).toEqual({ a: 1 } as any)
     })
@@ -20,7 +19,6 @@ describe('pick', () => {
 })
 
 describe('toSnakeCase', () => {
-
     it.each([
         ['', ''],
         [' ', '_'],

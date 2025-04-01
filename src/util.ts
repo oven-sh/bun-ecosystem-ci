@@ -1,9 +1,9 @@
 /**
  * Pick keys from an object. Missing keys will be ignored.
- * 
+ *
  * @param obj The object to pick keys from
  * @param keys The keys to pick
- * 
+ *
  * @returns a new object with only the picked keys.
  */
 export const pick = <
@@ -42,7 +42,7 @@ export const toSnakeCase = (str: string): string => {
     if (str.includes('_')) return str.toLowerCase()
     // pascale or camel case
     return str
-        .replace(/^[A-Z]/, (c) => c.toLowerCase()) // handle first letter differently to avoid '_A'
+        .replace(/^[A-Z]/, c => c.toLowerCase()) // handle first letter differently to avoid '_A'
         .replace(/([A-Z])/g, '_$1')
         .replace(/\s+/g, '_')
         .toLowerCase()
