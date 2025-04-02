@@ -41,5 +41,4 @@ ln -fs ~/.bun/bin/bun ~/.bun/bin/bunx
 popd
 
 echo '' >> ~/.bashrc
-echo "export PATH=\"${tmpdir}/.bun/bin:\$PATH\"" >> ~/.bashrc
-export PATH="$HOME/.bun/bin:$PATH"
+echo "export PATH=\"\$HOME/.bun/bin:\$PATH\"" >> ~/.bashrc

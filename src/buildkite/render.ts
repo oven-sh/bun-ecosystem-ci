@@ -42,7 +42,8 @@ export class PipelineFactory {
             'export BUN_VERSION=canary',
             'bash ./.buildkite/setup-bun.sh',
             'unset BUN_VERSION',
-            'export PATH="$HOME/.bun/bin:$PATH"',
+            // 'export PATH="$HOME/.bun/bin:$PATH"',
+            '. ~/.bashrc',
             `echo "binary: '$(which bun)' revision: '$(bun --revision)'"`,
         ]
 
