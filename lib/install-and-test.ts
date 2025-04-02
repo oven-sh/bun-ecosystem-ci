@@ -102,7 +102,6 @@ export function installAndTest(
                 }
                 bunfig = bunfig.replaceAll('\n', '\\n')
 
-
                 const preinstall = rest.preinstall?.(ctx)
                 const postinstall = rest.postinstall?.(ctx)
 
@@ -120,18 +119,20 @@ export function installAndTest(
                             cwd: packageName,
                             key: 'create-bunfig',
                         }),
-                        preinstall && Step.from(preinstall, {
-                            cwd: packageName,
-                            key: 'preinstall',
-                        }),
+                        preinstall &&
+                            Step.from(preinstall, {
+                                cwd: packageName,
+                                key: 'preinstall',
+                            }),
                         Step.from(`${bun} install`, {
                             cwd: packageName,
                             key: 'install-deps',
                         }),
-                        postinstall && Step.from(postinstall, {
-                            cwd: packageName,
-                            key: 'postinstall',
-                        }),
+                        postinstall &&
+                            Step.from(postinstall, {
+                                cwd: packageName,
+                                key: 'postinstall',
+                            }),
 
                         Step.from(testStep, {
                             cwd: packageName,
