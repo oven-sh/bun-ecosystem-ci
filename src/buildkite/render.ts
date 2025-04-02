@@ -25,7 +25,7 @@ export class PipelineFactory {
 
     private pipeline: Pipeline
     private context: Context
-    private beforeEachCase: (PurpleStep | StringStep)[] = []
+    private beforeEachCase: string[]
 
     constructor(context?: Partial<Context>) {
         this.context = {
@@ -38,16 +38,10 @@ export class PipelineFactory {
             this.pipeline.addAgent(key, value)
         }
 
-        this.beforeEachCase.push(
-            {
-                label: 'Download Canary Build',
-                command: './.buildkite/setup-bun.sh',
-                env: {
-                    BUN_VERSION: 'canary',
-                },
-            },
-            'wait' as StringStep.Wait
-        )
+        this.beforeEachCase = [
+            'source ./.buildkite/setup-bun.sh',
+            'bun --revision',
+        ]
 
         this.renderTestCase = this.renderTestCase.bind(this)
     }
@@ -61,10 +55,8 @@ export class PipelineFactory {
         const suite = await TestSuite.reify(ecosystemSuite, this.context)
         const group: GroupStep = {
             group: suite.name,
-            steps: this.beforeEachCase.concat(
-                suite.cases.flatMap(testCase =>
-                    this.renderTestCase(testCase, suite.name)
-                )
+            steps: suite.cases.flatMap(testCase =>
+                this.renderTestCase(testCase, suite.name)
             ),
         }
         this.pipeline.addStep(group)
@@ -77,6 +69,7 @@ export class PipelineFactory {
         const scriptLines = shell.renderTestCase(testCase)
         const script = /* sh */ `
 set -e
+${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
 
