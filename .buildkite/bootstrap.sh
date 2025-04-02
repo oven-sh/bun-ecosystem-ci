@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -eo pipefail
 
 curl -fsSL https://bun.sh/install | bash
 echo "bashrc:"
