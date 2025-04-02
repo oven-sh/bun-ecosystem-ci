@@ -9,7 +9,7 @@ import {
 } from '../lib'
 import suites from '../suites'
 import { pick, toSnakeCase } from './util'
-import { createPipeline } from './buildkite/render'
+import { PipelineFactory } from './buildkite/render'
 import { renderSuite as renderSuiteAsBashScript } from './shell'
 import { version } from '../package.json'
 
@@ -66,21 +66,26 @@ export default function main(argv: string[]): void {
                     }
                 }
                 if (!suite) program.error(`Unknown suite: ${suiteName}`)
-                await renderSuite(suite, {
+                await renderSuites([suite], {
                     output: outdir,
                     format,
                     bun,
                     suiteKey: suiteName,
                 })
             } else {
-                for (const [key, suite] of Object.entries(suites)) {
-                    renderSuite(suite, {
-                        suiteKey: key,
-                        output: outdir,
-                        format,
-                        bun,
-                    })
-                }
+                // for (const [key, suite] of Object.entries(suites)) {
+                //     await renderSuite(suite, {
+                //         suiteKey: key,
+                //         output: outdir,
+                //         format,
+                //         bun,
+                //     })
+                // }
+                await renderSuites(Object.values(suites), {
+                    output: outdir,
+                    format,
+                    bun,
+                })
             }
         })
 
@@ -108,43 +113,47 @@ interface RenderOptions {
     bun: string
     suiteKey?: string
 }
-async function renderSuite(
-    suite: EcosystemSuite,
+async function renderSuites(
+    suites: EcosystemSuite[],
     options: RenderOptions
 ): Promise<void> {
-    const testSuite = await TestSuite.reify(suite, {
+    const ctx: Context = {
         isLocal: false,
         bun: options.bun,
-    })
-    const name = testSuite.name || options.suiteKey
-    assert(name)
-    let absoluteFilepath: string
+    }
+    // let absoluteFilepath: string
 
     switch (options.format) {
         case 'buildkite': {
-            const filename = toSnakeCase(name) + '.yml'
-            absoluteFilepath = path.join(options.output, filename)
-            const pipeline = await createPipeline(suite)
-            await Bun.write(absoluteFilepath, pipeline.toYAML())
+            const factory = new PipelineFactory(ctx)
+            for (const suite of suites) {
+                await factory.addTestSuite(suite)
+            }
+            const filename = 'ecosystem-ci.yml'
+            const absoluteFilepath = path.join(options.output, filename)
+            const relativeFilepath = path.relative(process.cwd(), absoluteFilepath)
+            await Bun.write(absoluteFilepath, factory.toYAML())
+            console.log(`Saved pipeline to '${relativeFilepath}'`)
             break
         }
+
         case 'shell': {
-            const filename = toSnakeCase(name) + '.sh'
-            absoluteFilepath = path.join(options.output, filename)
-            const testSuite =
-                typeof suite === 'function'
-                    ? await suite({ isLocal: false, bun: options.bun })
-                    : suite
-            const script = renderSuiteAsBashScript(testSuite).join('\n')
-            await Bun.write(absoluteFilepath, script)
+            for (const suite of suites) {
+                const testSuite = await TestSuite.reify(suite, ctx)
+                const name = testSuite.name || options.suiteKey
+                assert(name)
+                const filename = toSnakeCase(name) + '.sh'
+                const absoluteFilepath = path.join(options.output, filename)
+                const relativeFilepath = path.relative(process.cwd(), absoluteFilepath)
+                const script = renderSuiteAsBashScript(testSuite).join('\n')
+                await Bun.write(absoluteFilepath, script)
+                console.log(`Saved pipeline to '${relativeFilepath}'`)
+            }
             break
         }
         default:
             throw new TypeError(`Unknown CI format: ${options.format}`)
     }
-    console.log(
-        `Saved pipeline to '${path.relative(process.cwd(), absoluteFilepath)}'`
-    )
 }
 
 interface RunTestOptions {
