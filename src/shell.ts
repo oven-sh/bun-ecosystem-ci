@@ -43,9 +43,7 @@ export function renderTestCase(testCase: TestCase): string[] {
     let lines = [
         `# Test Case: ${name}`,
         `echo 'Running Test Case: ${name.replaceAll("'", "\\'")}'`,
-        ...withDir(cwd)(
-            steps.flatMap(renderStep)
-        ),
+        ...withDir(cwd)(steps.flatMap(renderStep)),
     ]
 
     if (skip) {

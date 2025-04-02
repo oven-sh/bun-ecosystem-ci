@@ -131,7 +131,10 @@ async function renderSuites(
             }
             const filename = 'ecosystem-ci.yml'
             const absoluteFilepath = path.join(options.output, filename)
-            const relativeFilepath = path.relative(process.cwd(), absoluteFilepath)
+            const relativeFilepath = path.relative(
+                process.cwd(),
+                absoluteFilepath
+            )
             await Bun.write(absoluteFilepath, factory.toYAML())
             console.log(`Saved pipeline to '${relativeFilepath}'`)
             break
@@ -144,7 +147,10 @@ async function renderSuites(
                 assert(name)
                 const filename = toSnakeCase(name) + '.sh'
                 const absoluteFilepath = path.join(options.output, filename)
-                const relativeFilepath = path.relative(process.cwd(), absoluteFilepath)
+                const relativeFilepath = path.relative(
+                    process.cwd(),
+                    absoluteFilepath
+                )
                 const script = renderSuiteAsBashScript(testSuite).join('\n')
                 await Bun.write(absoluteFilepath, script)
                 console.log(`Saved pipeline to '${relativeFilepath}'`)
