@@ -45,12 +45,13 @@ export class PipelineFactory {
         const suite = await TestSuite.reify(ecosystemSuite, this.context)
         const group: GroupStep = {
             group: suite.name,
-            steps: suite.cases.flatMap(this.renderTestCase),
+            steps: suite.cases.flatMap(testCase => this.renderTestCase(testCase, suite.name)),
         }
         this.pipeline.addStep(group)
     }
 
-    private renderTestCase(testCase: TestCase): PurpleStep {
+    private renderTestCase(testCase: TestCase, suiteName?: string): PurpleStep {
+        const label = suiteName ? `${suiteName}: ${testCase.name}` : testCase.name
         const scriptLines = shell.renderTestCase(testCase)
         const script = /* sh */`
 set -e
@@ -58,7 +59,7 @@ ${scriptLines.join('\n')}
 `.trim()
 
         return {
-            label: testCase.name,
+            label,
             skip: testCase.skip,
             env: testCase.env,
             command: script,
