@@ -7,9 +7,4 @@ steps:
   - label: ":pipeline:"
     agents:
       queue: "build-image"
-    commands:
-      - "curl -fsSL https://bun.sh/install | bash"
-      - wait
-      - "bun install"
-      - wait
-      - "bun src/index.ts"
+    command: ".buildkite/bootstrap.sh"
