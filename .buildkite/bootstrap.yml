@@ -2,7 +2,7 @@
 # https://buildkite.com/docs/pipelines/defining-steps
 #
 # Changes to this file must be manually edited here:
-# https://buildkite.com/bun/bun/settings/steps
+# https://buildkite.com/bun/ecosystem-ci/settings/steps
 steps:
   - label: ":pipeline:"
     agents:
