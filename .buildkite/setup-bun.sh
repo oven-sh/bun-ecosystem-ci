@@ -31,6 +31,7 @@ esac
 
 target="bun-${os}-${arch}"
 pushd $tmpdir
+echo "Downloading ${target}..."
 curl -LO "${download_url}/${release}/${target}.zip" --retry 5
 unzip ${target}.zip
 mkdir -p ~/.bun/bin

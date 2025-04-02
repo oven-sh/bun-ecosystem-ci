@@ -43,7 +43,7 @@ export class PipelineFactory {
             'bash ./.buildkite/setup-bun.sh',
             'unset BUN_VERSION',
             'export PATH="$HOME/.bun/bin:$PATH"',
-            'bun --revision',
+            `echo "binary: '$(which bun)' revision: '$(bun --revision)'"`,
         ]
 
         this.renderTestCase = this.renderTestCase.bind(this)
