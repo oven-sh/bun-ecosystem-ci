@@ -30,12 +30,15 @@ case "${bun_version}" in
 esac
 
 target="bun-${os}-${arch}"
+pushd $tmpdir
 curl -LO "${download_url}/${release}/${target}.zip" --retry 5
 unzip ${target}.zip
-mkdir -p $tmpdir/.bun/bin
-mv ${target}/bun* $tmpdir/.bun/bin/
-chmod +x $tmpdir/.bun/bin/*
-ln -fs $tmpdir/.bun/bin/bun $tmpdir/.bun/bin/bunx
+mkdir -p ~/.bun/bin
+mv ${target}/bun* ~/.bun/bin/
+chmod +x ~/.bun/bin/*
+ln -fs ~/.bun/bin/bun ~/.bun/bin/bunx
+popd
 
 echo '' >> ~/.bashrc
 echo "export PATH=\"${tmpdir}/.bun/bin:\$PATH\"" >> ~/.bashrc
+export PATH="$HOME/.bun/bin:$PATH"
