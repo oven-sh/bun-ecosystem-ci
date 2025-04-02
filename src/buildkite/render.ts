@@ -38,14 +38,16 @@ export class PipelineFactory {
             this.pipeline.addAgent(key, value)
         }
 
-        this.beforeEachCase.push({
-            label: 'Download Canary Build',
-            command: './buildkite/setup-bun.sh',
-            env: {
-                BUN_VERSION: 'canary',
+        this.beforeEachCase.push(
+            {
+                label: 'Download Canary Build',
+                command: './.buildkite/setup-bun.sh',
+                env: {
+                    BUN_VERSION: 'canary',
+                },
             },
-        })
-        
+            'wait' as StringStep.Wait
+        )
 
         this.renderTestCase = this.renderTestCase.bind(this)
     }
