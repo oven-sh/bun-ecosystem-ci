@@ -38,16 +38,14 @@ export class PipelineFactory {
             this.pipeline.addAgent(key, value)
         }
 
-        // this.pipeline
-        //     .addStep({
-        //         label: 'Upgrade Bun to Canary',
-        //         command: [
-        //             'whoami',
-        //             'sudo bun upgrade --canary',
-        //             'bun --revision',
-        //         ].join('\n'),
-        //     })
-        //     .addStep({ wait: '~' })
+        this.beforeEachCase.push({
+            label: 'Download Canary Build',
+            command: './buildkite/setup-bun.sh',
+            env: {
+                BUN_VERSION: 'canary',
+            },
+        })
+        
 
         this.renderTestCase = this.renderTestCase.bind(this)
     }
