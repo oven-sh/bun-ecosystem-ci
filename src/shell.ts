@@ -16,8 +16,7 @@ export function renderSuite(suite: TestSuite): string[] {
         .map(renderTestCase)
         .map(steps => (steps.push('\n'), steps))
         .flat()
-    // renderedCases.unshift(`# Suite: ${name}`)
-    // return renderedCases
+
     return [
         '#!/bin/bash',
         `# Suite: ${name}`,
@@ -44,12 +43,7 @@ export function renderTestCase(testCase: TestCase): string[] {
     let lines = [
         `# Test Case: ${name}`,
         `echo 'Running Test Case: ${name.replaceAll("'", "\\'")}'`,
-        ...withDir(cwd)(
-            steps
-                .map(renderStep)
-                .map(steps => (steps.push('\n'), steps))
-                .flat()
-        ),
+        ...withDir(cwd)(steps.flatMap(renderStep)),
     ]
 
     if (skip) {
@@ -72,19 +66,19 @@ export function renderStep(step: Step): string[] {
     const { name, cwd, env, run } = step
     assert(run.length > 0, `Step '${name || '<anonymous>'}' has no commands`)
 
-    let lines: string[] = []
-    if (cwd) lines.push(`cd ${cwd}`)
+    let cmds: string[] = []
+    if (cwd) cmds.push(`cd ${cwd}`)
     if (env)
         for (const [key, value] of Object.entries(env)) {
-            lines.push(`export ${key}="${value}"`)
+            cmds.push(`export ${key}="${value}"`)
         }
-    lines.push(...run)
+    cmds.push(...run)
 
-    return [
-        `# Step: ${name ?? [run[0]]}`,
-        name && `echo '${name?.replaceAll("'", "\\'")}'`,
-        ...subshell(indent(lines)),
-    ].filter(Boolean) as string[]
+    const lines = [`# Step: ${name ?? [run[0]]}`]
+    if (name) lines.push(`echo '${name.replaceAll("'", "\\'")}'`)
+    lines.push(...subshell(indent(cmds)))
+
+    return lines
 }
 
 type Lines = string[] | (() => string[])
@@ -104,6 +98,6 @@ const INDENT = '  '
 
 /** Change directories for the duration of some commands */
 const withDir = (dir: string | undefined) =>
-    dir ? wrap(`pushd ${dir}`, 'popd') : wrap('', '')
+    dir ? wrap(`pushd ${dir}`, 'popd') : reifyLines //wrap('', '')
 /** Runs commands in a subshell */
 const subshell = wrap('(', ')')
