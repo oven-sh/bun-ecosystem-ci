@@ -6,7 +6,7 @@
 steps:
   - label: ":pipeline:"
     agents:
-      queue: "ci"
+      queue: "build-image"
     commands:
       - "curl -fsSL https://bun.sh/install | bash"
       - wait
