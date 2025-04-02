@@ -53,7 +53,7 @@ export class PipelineFactory {
     private renderTestCase(testCase: TestCase): PurpleStep {
         const scriptLines = shell.renderTestCase(testCase)
         const script = /* sh */`
-set -eo pipefail
+set -e
 ${scriptLines.join('\n')}
 `.trim()
 
