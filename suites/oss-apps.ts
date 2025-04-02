@@ -13,4 +13,9 @@ export default installAndTest('oss applications', {
         postinstall: ({ bun }) => `${bun} run build`,
         failing: true, // uses pnpm workspaces
     },
+    // they use bun
+    onlook: {
+        repository: 'https://github.com/onlook-dev/onlook',
+        postinstall: ({ bun }) => `${bun} run build`,
+    },
 })

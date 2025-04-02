@@ -23,6 +23,7 @@ if [ -d ${packageName} ]; then
     git reset --hard ${ref}
 else
     echo "cloning ${repository}/${ref}"
+    ${clone}
 fi
 `.trim()
 
