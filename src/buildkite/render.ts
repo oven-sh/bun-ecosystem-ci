@@ -43,20 +43,11 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
     for (const [key, value] of Object.entries(ciAgent)) {
         pipeline.addAgent(key, value)
     }
-    // pipeline
-    //     .addStep({
-    //         key: 'install-bun',
-    //         name: 'Install Bun',
-    //         command: 'curl -fsSL https://bun.sh/install | bash',
-    //     })
-    //     .addStep(sequential)
 
     for (const testCase of testSuite.cases) {
         const group: GroupStep = {
             // https://buildkite.com/docs/pipelines/configure/step-types/group-step
             group: testCase.name,
-            // depends_on: ['install-bun'],
-            // skip: testCase.skip,
             steps: testCase.steps.flatMap(step => [
                 mapStep(step) satisfies PurpleStep,
                 StringStep.Wait,
