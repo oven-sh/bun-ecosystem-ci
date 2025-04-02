@@ -1,6 +1,9 @@
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { GroupStep } from '@buildkite/buildkite-sdk'
-import type { StringStep, PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import type {
+    StringStep,
+    PurpleStep,
+} from '@buildkite/buildkite-sdk/src/schema'
 import type { Context, EcosystemSuite, TestCase } from '../../lib'
 import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
@@ -35,16 +38,16 @@ export class PipelineFactory {
             this.pipeline.addAgent(key, value)
         }
 
-        this.pipeline
-            .addStep({
-                label: 'Upgrade Bun to Canary',
-                command: [
-                    'whoami',
-                    'sudo bun upgrade --canary',
-                    'bun --revision',
-                ].join('\n'),
-            })
-            .addStep({ wait: '~' })
+        // this.pipeline
+        //     .addStep({
+        //         label: 'Upgrade Bun to Canary',
+        //         command: [
+        //             'whoami',
+        //             'sudo bun upgrade --canary',
+        //             'bun --revision',
+        //         ].join('\n'),
+        //     })
+        //     .addStep({ wait: '~' })
 
         this.renderTestCase = this.renderTestCase.bind(this)
     }
@@ -58,15 +61,21 @@ export class PipelineFactory {
         const suite = await TestSuite.reify(ecosystemSuite, this.context)
         const group: GroupStep = {
             group: suite.name,
-            steps: this.beforeEachCase.concat(suite.cases.flatMap(testCase => this.renderTestCase(testCase, suite.name))),
+            steps: this.beforeEachCase.concat(
+                suite.cases.flatMap(testCase =>
+                    this.renderTestCase(testCase, suite.name)
+                )
+            ),
         }
         this.pipeline.addStep(group)
     }
 
     private renderTestCase(testCase: TestCase, suiteName?: string): PurpleStep {
-        const label = suiteName ? `${suiteName}: ${testCase.name}` : testCase.name
+        const label = suiteName
+            ? `${suiteName}: ${testCase.name}`
+            : testCase.name
         const scriptLines = shell.renderTestCase(testCase)
-        const script = /* sh */`
+        const script = /* sh */ `
 set -e
 ${scriptLines.join('\n')}
 `.trim()
@@ -79,4 +88,3 @@ ${scriptLines.join('\n')}
         }
     }
 }
-
