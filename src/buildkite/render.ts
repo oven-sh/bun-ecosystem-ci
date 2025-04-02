@@ -1,13 +1,11 @@
-import type { Context, EcosystemSuite, TestCase } from '../../lib'
-import { TestSuite } from '../../lib/test-suite'
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { GroupStep } from '@buildkite/buildkite-sdk'
-import { type PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import type { StringStep, PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import type { Context, EcosystemSuite, TestCase } from '../../lib'
+import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
 
 export class PipelineFactory {
-    private pipeline: Pipeline
-    private context: Context
     static #ciAgent: Record<string, string> = {
         os: 'linux',
         arch: 'aarch64',
@@ -21,6 +19,10 @@ export class PipelineFactory {
         'instance-type': 'c8g.xlarge',
         'threads-per-core': '1',
     }
+
+    private pipeline: Pipeline
+    private context: Context
+    private beforeEachCase: (PurpleStep | StringStep)[] = []
 
     constructor(context?: Partial<Context>) {
         this.context = {
@@ -36,7 +38,11 @@ export class PipelineFactory {
         this.pipeline
             .addStep({
                 label: 'Upgrade Bun to Canary',
-                command: 'bun upgrade --canary\nbun --revision'
+                command: [
+                    'whoami',
+                    'sudo bun upgrade --canary',
+                    'bun --revision',
+                ].join('\n'),
             })
             .addStep({ wait: '~' })
 
@@ -52,7 +58,7 @@ export class PipelineFactory {
         const suite = await TestSuite.reify(ecosystemSuite, this.context)
         const group: GroupStep = {
             group: suite.name,
-            steps: suite.cases.flatMap(testCase => this.renderTestCase(testCase, suite.name)),
+            steps: this.beforeEachCase.concat(suite.cases.flatMap(testCase => this.renderTestCase(testCase, suite.name))),
         }
         this.pipeline.addStep(group)
     }
