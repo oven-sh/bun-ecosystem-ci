@@ -18,6 +18,7 @@ export default installAndTest('oss applications', {
     // they use bun
     onlook: {
         repository: 'https://github.com/onlook-dev/onlook',
+        ref: 'v0.2.24',
         postinstall: ({ bun }) => `${bun} run build`,
     },
 })

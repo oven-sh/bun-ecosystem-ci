@@ -1,9 +1,6 @@
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { GroupStep } from '@buildkite/buildkite-sdk'
-import type {
-    StringStep,
-    PurpleStep,
-} from '@buildkite/buildkite-sdk/src/schema'
+import type { PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
 import type { Context, EcosystemSuite, TestCase } from '../../lib'
 import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
@@ -42,7 +39,6 @@ export class PipelineFactory {
             'export BUN_VERSION=canary',
             'bash ./.buildkite/setup-bun.sh',
             'unset BUN_VERSION',
-            // 'export PATH="$HOME/.bun/bin:$PATH"',
             '. ~/.bashrc',
             `echo "binary: '$(which bun)' revision: '$(bun --revision)'"`,
         ]
