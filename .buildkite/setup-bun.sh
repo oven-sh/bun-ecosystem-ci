@@ -40,5 +40,7 @@ chmod +x ~/.bun/bin/*
 ln -fs ~/.bun/bin/bun ~/.bun/bin/bunx
 popd
 
+# update both bashrc and current shell
 echo '' >> ~/.bashrc
 echo "export PATH=\"\$HOME/.bun/bin:\$PATH\"" >> ~/.bashrc
+export PATH="$HOME/.bun/bin:$PATH"
