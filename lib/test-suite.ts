@@ -6,17 +6,18 @@ import type { Maybe } from './types'
  *
  * These types are designed to be mappable to both `bun test` and
  * buildkite.
- * - `TestSuite` -> workflow
- * - `TestCase` -> job
- * - `Step` -> step lol
- *
+ * - {@link TestSuite} -> workflow
+ * - {@link TestCase} -> job
+ * - {@link Step} -> step lol
  */
 export interface Context {
     /**
      * Are we running tests locally or in CI?
      */
     isLocal: boolean
-    /** Name of bun binary. Use this instead of hardcoding `'bun'` into steps. */
+    /**
+     * Name of bun binary. Use this instead of hardcoding `'bun'` into steps.
+     */
     bun: string
 }
 
@@ -27,14 +28,30 @@ export type EcosystemSuite =
 export interface TestSuite {
     name?: string
     cases: TestCase[]
-    beforeAll?: (context: Context) => void | Promise<void>
-    afterAll?: (context: Context) => void | Promise<void>
+    beforeAll?: (context: Readonly<Context>) => void | Promise<void>
+    afterAll?: (context: Readonly<Context>) => void | Promise<void>
+}
+export namespace TestSuite {
+    export async function reify(
+        suite: EcosystemSuite,
+        context: Readonly<Context>
+    ): Promise<TestSuite> {
+        const testSuite =
+            typeof suite === 'function' ? await suite(context) : suite
+        return testSuite
+    }
 }
 
 export interface TestCase {
+    /**
+     * Display name of the test case.
+     */
     name: string
     steps: Step[]
     /**
+     * Default working directory for all {@link Step steps}. Steps may
+     * individually override this.
+     *
      * @default process.cwd()
      */
     cwd?: string
@@ -117,6 +134,14 @@ export namespace TestCase {
 }
 
 export interface Step {
+    /**
+     * Unique identifier for the step. Should be in `kebab-case`.
+     * @example "install-bun"
+     */
+    key?: string
+    /**
+     * Human-friendly display name
+     */
     name?: string
     /**
      * Each line is a shell command to run
@@ -128,6 +153,9 @@ export interface Step {
      * Overrides existing values in {@link process.env} and {@link TestCase.env}
      */
     env?: Record<string, string | undefined>
+    /**
+     * Current working directory to use when running commands for this step.
+     */
     cwd?: string
 }
 export namespace Step {
@@ -151,5 +179,19 @@ export namespace Step {
             env: rest.env,
             cwd: rest.cwd,
         }
+    }
+
+    /**
+     * @returns `true` if `value` is a {@link Step}
+     */
+    export function is(value: unknown): value is Step {
+        if (typeof value !== 'object' || !value) return false
+        if (!('run' in value) || !Array.isArray(value.run)) return false
+        if ('name' in value) {
+            const name = value.name
+            if (name !== undefined && typeof name !== 'string') return false
+        }
+
+        return true
     }
 }

@@ -10,7 +10,7 @@ on:
             - main
 
 env:
-    BUN_VERSION: 1.2.1
+    BUN_VERSION: 1.2.8
 
 jobs:
     lint:
@@ -32,5 +32,7 @@ jobs:
             - uses: oven-sh/setup-bun@v2
               with:
                   bun-version: ${{ env.BUN_VERSION }}
+            - name: Install shellcheck
+              run: sudo apt-get install -y shellcheck
             - run: bun install --frozen-lockfile
             - run: bun test

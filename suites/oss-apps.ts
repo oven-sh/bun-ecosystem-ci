@@ -1,6 +1,6 @@
 import { installAndTest } from '../lib'
 
-export default installAndTest({
+export default installAndTest('oss applications', {
     // AFFiNE: {
     //     repository: 'https://github.com/toeverything/AFFiNE',
     //     ref: 'canary',

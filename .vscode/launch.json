@@ -4,29 +4,45 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "debug [bun]",
-            "program": "${workspaceFolder}/src/index.ts",
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "watchMode": false
-        },
         // run suite with bun-debug. Assumes this repo is located next to your `bun` repo
         {
             "type": "bun",
             "internalConsoleOptions": "neverOpen",
             "request": "launch",
-            "name": "debug [bun-debug]",
+            "name": "[bun-debug] debug",
             "program": "${workspaceFolder}/src/index.ts",
             "args": [
                 "--bun",
                 "${workspaceFolder}/../bun/build/debug/bun-debug"
             ],
             "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "watchMode": false
+        },
+        {
+            "type": "bun",
+            "internalConsoleOptions": "neverOpen",
+            "request": "launch",
+            "name": "[bun] debug",
+            "program": "${workspaceFolder}/src/index.ts",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "watchMode": false
+        },
+        {
+            "type": "bun",
+            "internalConsoleOptions": "neverOpen",
+            "request": "launch",
+            "name": "[bun] render --format buildkite",
+            "program": "${workspaceFolder}/src/index.ts",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "render",
+                "--format",
+                "buildkite",
+                "--suite",
+                "foundation regression"
+            ],
             "stopOnEntry": false,
             "watchMode": false
         },

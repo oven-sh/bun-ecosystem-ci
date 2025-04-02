@@ -1,5 +1,6 @@
 {
   "name": "ecosystem-ci",
+  "version": "0.0.1",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
@@ -7,18 +8,19 @@
     "start": "bun src/index.ts",
     "lint": "oxlint",
     "lint:fix": "bun run lint --fix",
-    "fmt": "prettier -w **/*.{ts,md,yaml}",
+    "fmt": "prettier -w '**/*.{ts,md,yaml}'",
     "format": "prettier -w **/*.{ts,md,yaml}",
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "@buildkite/buildkite-sdk": "^0.2.0",
     "commander": "^13.1.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "^1.2.8",
     "oxlint": "^0.15.6",
     "prettier": "^3.4.2"
   }

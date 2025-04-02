@@ -46,6 +46,7 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
  * @param packages Packages to clone and test. Each one gets turned into a {@link TestCase}.
  */
 export function installAndTest(
+    name: string,
     packages: Record<string, Package>
 ): EcosystemSuite {
     return function doInstallAndTest(ctx) {
@@ -91,24 +92,41 @@ export function installAndTest(
                             preload.map(p => `\\"${p}\\"`).join(', ') +
                             ']\n'
                     } else {
-                        bunfig += `preload = \\"${preload}\\"`
+                        bunfig += `preload = \\"${preload}\\"\n`
                     }
                 }
+                bunfig = bunfig.replaceAll('\n', '\\n')
 
                 // const steps =
                 const testCase = TestCase.from(packageName, {
                     ...rest,
                     steps: [
-                        steps.checkout({ packageName, ref, repository }),
-                        Step.from(`echo "${bunfig}" > bunfig.toml`, {
+                        steps.checkout({
+                            packageName,
+                            ref,
+                            repository,
+                            isLocal: ctx.isLocal,
+                        }),
+                        Step.from(`printf "${bunfig}" > bunfig.toml`, {
                             name: 'Create bunfig',
                             cwd: packageName,
+                            key: 'create-bunfig',
                         }),
-                        Step.from(`${bun} install`, { cwd: packageName }),
+                        Step.from(`${bun} install`, {
+                            cwd: packageName,
+                            key: 'install-deps',
+                        }),
                         postinstall &&
-                            Step.from(postinstall(ctx), { cwd: packageName }),
+                            Step.from(postinstall(ctx), {
+                                cwd: packageName,
+                                key: 'postinstall',
+                            }),
 
-                        Step.from(testStep, { cwd: packageName, env: testEnv }),
+                        Step.from(testStep, {
+                            cwd: packageName,
+                            env: testEnv,
+                            key: 'run-tests',
+                        }),
                     ],
                 })
 
@@ -119,6 +137,7 @@ export function installAndTest(
         )
 
         return {
+            name,
             cases,
             async beforeAll({ isLocal }: Context) {
                 if (isLocal) {

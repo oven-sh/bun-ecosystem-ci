@@ -7,7 +7,7 @@
 
 import { installAndTest } from '../lib'
 
-export default installAndTest({
+export default installAndTest('foundation regression', {
     /**
      * it's got like 116m downloads
      * https://www.npmjs.com/package/minipass

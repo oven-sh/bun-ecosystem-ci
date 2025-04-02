@@ -1,5 +1,5 @@
-export type { Context, TestSuite } from './test-suite'
-export { TestCase, Step } from './test-suite'
+export type { Context, EcosystemSuite } from './test-suite'
+export { TestSuite, TestCase, Step } from './test-suite'
 export * as steps from './steps'
 
 // test suite templates
