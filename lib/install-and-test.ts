@@ -3,6 +3,7 @@ import fs from 'fs'
 import type { Context, EcosystemSuite } from './test-suite'
 import { TestCase, Step } from './test-suite'
 import * as steps from './steps'
+import type { Maybe } from './types'
 
 interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
     /**
@@ -26,7 +27,11 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
     /**
      * Run a step after `bun install`
      */
-    postinstall?: (ctx: Context) => string | Step
+    postinstall?: (ctx: Context) => Maybe<string | Step>
+    /**
+     * Run a step before `bun install`
+     */
+    preinstall?: (ctx: Context) => Maybe<string | Step>
     /**
      * Preload scripts to include when testing. These get added into `bunfig.toml`.
      *
@@ -64,7 +69,7 @@ export function installAndTest(
                         repository,
                         ref = 'main',
                         preload,
-                        postinstall,
+                        // postinstall,
                         ...rest
                     },
                 ]
@@ -97,7 +102,10 @@ export function installAndTest(
                 }
                 bunfig = bunfig.replaceAll('\n', '\\n')
 
-                // const steps =
+
+                const preinstall = rest.preinstall?.(ctx)
+                const postinstall = rest.postinstall?.(ctx)
+
                 const testCase = TestCase.from(packageName, {
                     ...rest,
                     steps: [
@@ -112,15 +120,18 @@ export function installAndTest(
                             cwd: packageName,
                             key: 'create-bunfig',
                         }),
+                        preinstall && Step.from(preinstall, {
+                            cwd: packageName,
+                            key: 'preinstall',
+                        }),
                         Step.from(`${bun} install`, {
                             cwd: packageName,
                             key: 'install-deps',
                         }),
-                        postinstall &&
-                            Step.from(postinstall(ctx), {
-                                cwd: packageName,
-                                key: 'postinstall',
-                            }),
+                        postinstall && Step.from(postinstall, {
+                            cwd: packageName,
+                            key: 'postinstall',
+                        }),
 
                         Step.from(testStep, {
                             cwd: packageName,
