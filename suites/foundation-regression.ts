@@ -38,6 +38,7 @@ export default installAndTest('foundation regression', {
         repository: 'https://github.com/ardatan/graphql-tools',
         ref: 'master',
         test: 'test:bun',
+        postinstall: ({ bun }) => `${bun} run build`,
         failing: true,
     },
     hono: {
