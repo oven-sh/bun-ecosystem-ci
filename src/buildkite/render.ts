@@ -33,6 +33,13 @@ export class PipelineFactory {
             this.pipeline.addAgent(key, value)
         }
 
+        this.pipeline
+            .addStep({
+                label: 'Upgrade Bun to Canary',
+                command: 'bun upgrade --canary\nbun --revision'
+            })
+            .addStep({ wait: '~' })
+
         this.renderTestCase = this.renderTestCase.bind(this)
     }
 
