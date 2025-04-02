@@ -2,12 +2,15 @@
 import type { TestSuite, Step, Context, EcosystemSuite } from '../../lib'
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { CommandStep, GroupStep, WaitStep } from '@buildkite/buildkite-sdk'
-import { StringStep, type PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import {
+    StringStep,
+    type PurpleStep,
+} from '@buildkite/buildkite-sdk/src/schema'
 
 /**
  * Create a Buildkite {@link Pipeline} YAML file from a
  * runtime-agnostic {@link TestSuite}.
- * 
+ *
  * @param suite either a {@link TestSuite} or a suite factory function
  * @returns a new BuildKite pipeline object, which can be serialized to YAML
  */
@@ -17,7 +20,8 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
         isLocal: false,
         bun: 'bun',
     })
-    const testSuite: TestSuite = typeof suite === 'function' ? await suite(context) : suite
+    const testSuite: TestSuite =
+        typeof suite === 'function' ? await suite(context) : suite
 
     /** Force following step to wait for previous steps to complete */
     const sequential: WaitStep = { wait: '~' }
@@ -35,8 +39,11 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
             group: testCase.name,
             depends_on: ['install-bun'],
             // skip: testCase.skip,
-            steps: testCase.steps.flatMap(step => [mapStep(step) satisfies PurpleStep, StringStep.Wait]),
-        };
+            steps: testCase.steps.flatMap(step => [
+                mapStep(step) satisfies PurpleStep,
+                StringStep.Wait,
+            ]),
+        }
         if (testCase.skip) group.skip = true
         pipeline.addStep(group)
     }
@@ -54,8 +61,9 @@ function mapStep(step: Step) {
             throw new Error('Step has no commands')
         case 1:
             cmd.command = step.run[0].replaceAll('\n', '\\n')
-            break;
-        default: cmd.commands = step.run.map(cmd => cmd.replaceAll('\n', '\\n'))
+            break
+        default:
+            cmd.commands = step.run.map(cmd => cmd.replaceAll('\n', '\\n'))
     }
 
     return {

@@ -1,0 +1,15 @@
+# Uploads the latest CI workflow to Buildkite.
+# https://buildkite.com/docs/pipelines/defining-steps
+#
+# Changes to this file must be manually edited here:
+# https://buildkite.com/bun/bun/settings/steps
+steps:
+  - label: ":pipeline:"
+    agents:
+      queue: "ci"
+    commands:
+      - "curl -fsSL https://bun.sh/install | bash"
+      - wait
+      - "bun install"
+      - wait
+      - "bun src/index.ts"
