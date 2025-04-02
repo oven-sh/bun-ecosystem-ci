@@ -17,5 +17,5 @@ export default installAndTest('oss applications', {
     onlook: {
         repository: 'https://github.com/onlook-dev/onlook',
         postinstall: ({ bun }) => `${bun} run build`,
-    }
+    },
 })
