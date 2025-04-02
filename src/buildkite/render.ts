@@ -7,6 +7,20 @@ import {
     type PurpleStep,
 } from '@buildkite/buildkite-sdk/src/schema'
 
+const ciAgent =  {
+    os: 'linux',
+    arch: 'aarch64',
+    distro: 'ubuntu',
+    release: '24.04',
+    robobun: 'true',
+    robobun2: 'true',
+    'cpu-count': '2',
+    'image-name': 'linux-aarch64-2404-ubuntu-v10',
+    preemptible: 'false',
+    'instance-type': 'c8g.xlarge',
+    'threads-per-core': '1',
+}
+
 /**
  * Create a Buildkite {@link Pipeline} YAML file from a
  * runtime-agnostic {@link TestSuite}.
@@ -26,6 +40,10 @@ export async function createPipeline(suite: EcosystemSuite): Promise<Pipeline> {
     /** Force following step to wait for previous steps to complete */
     const sequential: WaitStep = { wait: '~' }
     const pipeline = new Pipeline()
+    for (const [key, value] of Object.entries(ciAgent)) {
+        pipeline.addAgent(key, value)
+    }
+    pipeline
         .addStep({
             key: 'install-bun',
             name: 'Install Bun',
