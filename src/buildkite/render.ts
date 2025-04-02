@@ -40,8 +40,9 @@ export class PipelineFactory {
 
         this.beforeEachCase = [
             'export BUN_VERSION=canary',
-            '. ./.buildkite/setup-bun.sh',
+            'bash ./.buildkite/setup-bun.sh',
             'unset BUN_VERSION',
+            'export PATH="$HOME/.bun/bin:$PATH"',
             'bun --revision',
         ]
 
