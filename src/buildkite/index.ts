@@ -1,4 +1,3 @@
-
 import suites from '../../suites'
 // import { createPipeline } from './render'
 import { PipelineFactory } from './render'
