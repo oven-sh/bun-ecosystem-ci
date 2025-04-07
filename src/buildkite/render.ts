@@ -68,16 +68,27 @@ export class PipelineFactory {
             : testCase.name
         const scriptLines = shell.renderTestCase(testCase)
         const script = /* sh */ `
-${testCase.failing ? 'unset -e' : 'set -e'}
+${testCase.failing ? 'set +e' : 'set -e'}
 ${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
+
 
         return {
             label,
             skip: testCase.skip,
             env: testCase.env,
             command: script,
+            concurrency_group: this.getConcurrencyKey(testCase, suiteName),
+            concurrency: 1,
         }
+    }
+
+    private getConcurrencyKey(testCase: TestCase, suiteName?: string): string {
+        const { BUILDKITE_BRANCH: branch = 'main' } = process.env
+        var key = `ecosystem-ci`
+        if (suiteName) key += `-${suiteName}`
+        key += `-${testCase.name}-${branch}`
+        return key
     }
 }
