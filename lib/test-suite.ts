@@ -15,6 +15,7 @@ export interface Context {
      * Are we running tests locally or in CI?
      */
     isLocal: boolean
+    runner: 'bun' | 'shell' | 'buildkite'
     /**
      * Name of bun binary. Use this instead of hardcoding `'bun'` into steps.
      */

@@ -166,8 +166,8 @@ export function installAndTest(
         return {
             name,
             cases,
-            async beforeAll({ isLocal }: Context) {
-                if (isLocal) {
+            async beforeAll({ isLocal, runner }: Context) {
+                if (isLocal && runner === 'bun') {
                     try {
                         await fs.promises.mkdir('repos', { recursive: true })
                     } catch (e) {

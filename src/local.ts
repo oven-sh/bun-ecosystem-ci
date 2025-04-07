@@ -57,7 +57,7 @@ export default function main(argv: string[]): void {
                     for (const ecosystemSuite of Object.values(suites)) {
                         const testSuite = await TestSuite.reify(
                             ecosystemSuite,
-                            { isLocal: false, bun }
+                            { isLocal: false, bun, runner: format }
                         )
                         if (testSuite.name === suiteName) {
                             suite = testSuite
@@ -73,14 +73,6 @@ export default function main(argv: string[]): void {
                     suiteKey: suiteName,
                 })
             } else {
-                // for (const [key, suite] of Object.entries(suites)) {
-                //     await renderSuite(suite, {
-                //         suiteKey: key,
-                //         output: outdir,
-                //         format,
-                //         bun,
-                //     })
-                // }
                 await renderSuites(Object.values(suites), {
                     output: outdir,
                     format,
@@ -118,8 +110,9 @@ async function renderSuites(
     options: RenderOptions
 ): Promise<void> {
     const ctx: Context = {
-        isLocal: false,
+        isLocal: true,
         bun: options.bun,
+        runner: options.format
     }
     // let absoluteFilepath: string
 
@@ -180,6 +173,7 @@ async function runAllTests({
         const localContext: Readonly<Context> = Object.freeze({
             isLocal: true,
             bun,
+            runner: 'bun'
         })
 
         const suite = await TestSuite.reify(createSuite, localContext)
