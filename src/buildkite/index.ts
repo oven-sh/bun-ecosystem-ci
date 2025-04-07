@@ -8,6 +8,7 @@ export default async function main(): Promise<void> {
     const context: Context = {
         isLocal: false,
         bun: 'bun',
+        runner: 'buildkite',
     }
     const builder = new PipelineFactory(context)
     for (const ecosystemSuite in suites) {

@@ -31,6 +31,7 @@ export class PipelineFactory {
         this.context = {
             isLocal: false,
             bun: 'bun',
+            runner: 'buildkite',
             ...context,
         }
         this.pipeline = new Pipeline()

@@ -43,6 +43,7 @@ describe(renderSuite, () => {
         const context: Readonly<Context> = Object.freeze({
             isLocal: true,
             bun: 'bun',
+            runner: 'shell',
         })
 
         beforeAll(async () => {
