@@ -21,7 +21,7 @@ export default installAndTest('foundation regression', {
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
-        test: 'unit'
+        test: 'unit',
     },
     koa: {
         repository: 'https://github.com/koajs/koa',
@@ -71,9 +71,9 @@ export default installAndTest('foundation regression', {
         },
     },
     prisma: {
-        preinstall: ({ isLocal, bun }) => isLocal ? undefined : `${bun} i -g pnpm`,
+        preinstall: ({ isLocal, bun }) =>
+            isLocal ? undefined : `${bun} i -g pnpm`,
         repository: 'https://github.com/prisma/prisma',
         postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
-
-    }
+    },
 })
