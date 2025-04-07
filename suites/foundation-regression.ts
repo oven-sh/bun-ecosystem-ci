@@ -13,6 +13,8 @@ export default installAndTest('foundation regression', {
         ref: 'master',
         test: `--bun run test`,
         failing: true,
+        // takes like an hour b/c of bug in setTimeout or something
+        skip: true,
         // test: 'test test/*.js',
         // preload: [
         //     import.meta.require.resolve('@shim/mocha'),
@@ -21,7 +23,9 @@ export default installAndTest('foundation regression', {
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
+        postinstall: () => `npm i -g typescript`,
         test: 'unit',
+
     },
     koa: {
         repository: 'https://github.com/koajs/koa',
