@@ -112,7 +112,7 @@ async function renderSuites(
     const ctx: Context = {
         isLocal: true,
         bun: options.bun,
-        runner: options.format
+        runner: options.format,
     }
     // let absoluteFilepath: string
 
@@ -173,7 +173,7 @@ async function runAllTests({
         const localContext: Readonly<Context> = Object.freeze({
             isLocal: true,
             bun,
-            runner: 'bun'
+            runner: 'bun',
         })
 
         const suite = await TestSuite.reify(createSuite, localContext)
