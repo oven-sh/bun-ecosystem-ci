@@ -11,6 +11,7 @@ export default installAndTest('oss applications', {
     remotion: {
         repository: 'https://github.com/remotion-dev/remotion',
         postinstall: ({ bun }) => `${bun} run build`,
+        install: 'pnpm install',
         preinstall: ({ isLocal, bun }) =>
             isLocal ? undefined : `${bun} install -g pnpm`,
         failing: true, // uses pnpm workspaces
