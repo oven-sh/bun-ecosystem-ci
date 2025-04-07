@@ -24,20 +24,28 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
      * Environment variables to set **only** for the test step
      */
     testEnv?: Record<string, string | undefined>
+    install?: string | StepFactory
     /**
      * Run a step after `bun install`
      */
-    postinstall?: (ctx: Context) => Maybe<string | Step>
+    postinstall?: StepFactory
     /**
      * Run a step before `bun install`
      */
-    preinstall?: (ctx: Context) => Maybe<string | Step>
+    preinstall?: StepFactory
     /**
      * Preload scripts to include when testing. These get added into `bunfig.toml`.
      *
      * @see [Bun docs - `test.preload`](https://bun.sh/docs/runtime/bunfig#test-preload)
      */
     preload?: string | string[]
+}
+
+type StepFactory = string | ((ctx: Context) => Maybe<string | Step>)
+const maybeRunFactory = (ctx: Context, factory: Maybe<StepFactory>): Maybe<string | Step> => {
+    if (typeof factory === 'string') return factory
+    if (factory == null) return undefined
+    return factory(ctx)
 }
 
 /**
@@ -102,8 +110,13 @@ export function installAndTest(
                 }
                 bunfig = bunfig.replaceAll('\n', '\\n')
 
-                const preinstall = rest.preinstall?.(ctx)
-                const postinstall = rest.postinstall?.(ctx)
+                const preinstall = maybeRunFactory(ctx, rest.preinstall)
+                const postinstall = maybeRunFactory(ctx, rest.postinstall)
+                const install = Step.from(maybeRunFactory(ctx, rest.install) ?? `${bun} install`, {
+                        cwd: packageName,
+                    }
+                )
+                install.key = 'install-deps' // must be set after in case install() returns a Step
 
                 const testCase = TestCase.from(packageName, {
                     ...rest,
@@ -124,10 +137,7 @@ export function installAndTest(
                                 cwd: packageName,
                                 key: 'preinstall',
                             }),
-                        Step.from(`${bun} install`, {
-                            cwd: packageName,
-                            key: 'install-deps',
-                        }),
+                        install,
                         postinstall &&
                             Step.from(postinstall, {
                                 cwd: packageName,

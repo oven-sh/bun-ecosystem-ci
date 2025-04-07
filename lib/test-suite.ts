@@ -165,8 +165,7 @@ export namespace Step {
         command: string | string[] | Step,
         rest: Options = {}
     ): Step {
-        if (typeof command === 'object' && !Array.isArray(command))
-            return command
+        if (Step.is(command)) return command
         return {
             name: rest.name,
             run: Array.isArray(command)

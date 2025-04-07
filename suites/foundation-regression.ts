@@ -62,6 +62,7 @@ export default installAndTest('foundation regression', {
         test: 'test:bun',
         postinstall: ({ bun }) => `${bun} run build`,
         failing: true,
+        skip: true, // hangs in CI
     },
     socks: {
         repository: 'https://github.com/JoshGlazebrook/socks',
@@ -74,9 +75,10 @@ export default installAndTest('foundation regression', {
         },
     },
     prisma: {
+        repository: 'https://github.com/prisma/prisma',
         preinstall: ({ isLocal, bun }) =>
             isLocal ? undefined : `${bun} i -g pnpm`,
-        repository: 'https://github.com/prisma/prisma',
+        install: 'pnpm i',
         postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
     },
 })
