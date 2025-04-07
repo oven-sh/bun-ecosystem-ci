@@ -68,7 +68,7 @@ export class PipelineFactory {
             : testCase.name
         const scriptLines = shell.renderTestCase(testCase)
         const script = /* sh */ `
-${testCase.failing ? '' : 'set -e'}
+${testCase.failing ? 'unset -e' : 'set -e'}
 ${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
