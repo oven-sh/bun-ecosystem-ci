@@ -36,6 +36,7 @@ export default installAndTest('foundation regression', {
     },
     elysia: {
         repository: 'https://github.com/elysiajs/elysia.git',
+        install: 'npm install',
         postinstall: ({ bun }) => `${bun} run build`,
     },
     nestjs: {
