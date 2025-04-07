@@ -8,15 +8,6 @@
 import { installAndTest } from '../lib'
 
 export default installAndTest('foundation regression', {
-    /**
-     * it's got like 116m downloads
-     * https://www.npmjs.com/package/minipass
-     */
-    minipass: {
-        repository: 'https://github.com/isaacs/minipass',
-        test: '--bun tap',
-        failing: true,
-    },
     express: {
         repository: 'https://github.com/expressjs/express',
         ref: 'master',
@@ -28,9 +19,37 @@ export default installAndTest('foundation regression', {
         //     './test/support/env.js',
         // ],
     },
+    fastify: {
+        repository: 'https://github.com/fastify/fastify.git',
+        test: 'unit'
+    },
+    koa: {
+        repository: 'https://github.com/koajs/koa',
+        ref: 'master',
+    },
+    hono: {
+        repository: 'https://github.com/honojs/hono',
+        test: 'test:bun',
+    },
     elysia: {
         repository: 'https://github.com/elysiajs/elysia.git',
         postinstall: ({ bun }) => `${bun} run build`,
+    },
+    nestjs: {
+        repository: 'https://github.com/nestjs/nest.git',
+        ref: 'master',
+        postinstall: ({ bun }) => `${bun} run build`,
+        test: 'test',
+        failing: true,
+    },
+    /**
+     * it's got like 116m downloads
+     * https://www.npmjs.com/package/minipass
+     */
+    minipass: {
+        repository: 'https://github.com/isaacs/minipass',
+        test: '--bun tap',
+        failing: true,
     },
 
     // these guys use bun
@@ -40,10 +59,6 @@ export default installAndTest('foundation regression', {
         test: 'test:bun',
         postinstall: ({ bun }) => `${bun} run build`,
         failing: true,
-    },
-    hono: {
-        repository: 'https://github.com/honojs/hono',
-        test: 'test:bun',
     },
     socks: {
         repository: 'https://github.com/JoshGlazebrook/socks',
@@ -55,4 +70,10 @@ export default installAndTest('foundation regression', {
             NODE_ENV: 'test',
         },
     },
+    prisma: {
+        preinstall: ({ isLocal, bun }) => isLocal ? undefined : `${bun} i -g pnpm`,
+        repository: 'https://github.com/prisma/prisma',
+        postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
+
+    }
 })
