@@ -23,7 +23,7 @@ export default installAndTest('foundation regression', {
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
-        postinstall: () => `npm i -g typescript`,
+        postinstall: ({ bun }) => `${bun} i typescript`,
         test: 'unit',
     },
     koa: {
