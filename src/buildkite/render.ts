@@ -1,6 +1,9 @@
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { GroupStep } from '@buildkite/buildkite-sdk'
-import type { PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import {
+    ConcurrencyMethod,
+    type PurpleStep,
+} from '@buildkite/buildkite-sdk/src/schema'
 import type { Context, EcosystemSuite, TestCase } from '../../lib'
 import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
@@ -68,7 +71,7 @@ export class PipelineFactory {
             : testCase.name
         const scriptLines = shell.renderTestCase(testCase)
         const script = /* sh */ `
-set -e
+${testCase.failing ? 'set +e' : 'set -e'}
 ${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
@@ -78,6 +81,17 @@ ${scriptLines.join('\n')}
             skip: testCase.skip,
             env: testCase.env,
             command: script,
+            concurrency_group: this.getConcurrencyKey(testCase, suiteName),
+            concurrency_method: ConcurrencyMethod.Eager,
+            concurrency: 1,
         }
+    }
+
+    private getConcurrencyKey(testCase: TestCase, suiteName?: string): string {
+        const { BUILDKITE_BRANCH: branch = 'main' } = process.env
+        var key = `ecosystem-ci`
+        if (suiteName) key += `-${suiteName}`
+        key += `-${testCase.name}-${branch}`
+        return key
     }
 }

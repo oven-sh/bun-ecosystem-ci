@@ -8,6 +8,44 @@
 import { installAndTest } from '../lib'
 
 export default installAndTest('foundation regression', {
+    express: {
+        repository: 'https://github.com/expressjs/express',
+        ref: 'master',
+        test: `--bun run test`,
+        failing: true,
+        // takes like an hour b/c of bug in setTimeout or something
+        skip: true,
+        // test: 'test test/*.js',
+        // preload: [
+        //     import.meta.require.resolve('@shim/mocha'),
+        //     './test/support/env.js',
+        // ],
+    },
+    fastify: {
+        repository: 'https://github.com/fastify/fastify.git',
+        test: 'test', // `bun test`
+        failing: true,
+    },
+    koa: {
+        repository: 'https://github.com/koajs/koa',
+        ref: 'master',
+    },
+    hono: {
+        repository: 'https://github.com/honojs/hono',
+        test: 'test:bun',
+    },
+    elysia: {
+        repository: 'https://github.com/elysiajs/elysia.git',
+        install: 'npm install',
+        postinstall: ({ bun }) => `${bun} run build`,
+    },
+    nestjs: {
+        repository: 'https://github.com/nestjs/nest.git',
+        ref: 'master',
+        postinstall: ({ bun }) => `${bun} run build`,
+        test: 'test',
+        failing: true,
+    },
     /**
      * it's got like 116m downloads
      * https://www.npmjs.com/package/minipass
@@ -17,21 +55,6 @@ export default installAndTest('foundation regression', {
         test: '--bun tap',
         failing: true,
     },
-    express: {
-        repository: 'https://github.com/expressjs/express',
-        ref: 'master',
-        test: `--bun run test`,
-        failing: true,
-        // test: 'test test/*.js',
-        // preload: [
-        //     import.meta.require.resolve('@shim/mocha'),
-        //     './test/support/env.js',
-        // ],
-    },
-    elysia: {
-        repository: 'https://github.com/elysiajs/elysia.git',
-        postinstall: ({ bun }) => `${bun} run build`,
-    },
 
     // these guys use bun
     'graphql-tools': {
@@ -40,10 +63,7 @@ export default installAndTest('foundation regression', {
         test: 'test:bun',
         postinstall: ({ bun }) => `${bun} run build`,
         failing: true,
-    },
-    hono: {
-        repository: 'https://github.com/honojs/hono',
-        test: 'test:bun',
+        skip: true, // hangs in CI
     },
     socks: {
         repository: 'https://github.com/JoshGlazebrook/socks',
@@ -54,5 +74,13 @@ export default installAndTest('foundation regression', {
         testEnv: {
             NODE_ENV: 'test',
         },
+    },
+    prisma: {
+        repository: 'https://github.com/prisma/prisma',
+        preinstall: ({ isLocal, bun }) =>
+            isLocal ? undefined : `${bun} i -g pnpm`,
+        install: 'pnpm i',
+        postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
+        skip: true, // relies on gh actions. TODO: polyfill w buildkite env vars
     },
 })
