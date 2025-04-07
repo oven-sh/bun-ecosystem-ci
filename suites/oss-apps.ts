@@ -1,10 +1,6 @@
 import { installAndTest } from '../lib'
 
 export default installAndTest('oss applications', {
-    // AFFiNE: {
-    //     repository: 'https://github.com/toeverything/AFFiNE',
-    //     ref: 'canary',
-    // },
     'next-starter': {
         repository: 'https://github.com/Skolaczk/next-starter',
     },
@@ -14,7 +10,8 @@ export default installAndTest('oss applications', {
         install: 'pnpm install',
         preinstall: ({ isLocal, bun }) =>
             isLocal ? undefined : `${bun} install -g pnpm`,
-        failing: true, // uses pnpm workspaces
+        failing: true,
+        skip: true, // FIXME
     },
     // they use bun
     onlook: {

@@ -81,5 +81,6 @@ export default installAndTest('foundation regression', {
             isLocal ? undefined : `${bun} i -g pnpm`,
         install: 'pnpm i',
         postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
+        skip: true, // relies on gh actions. TODO: polyfill w buildkite env vars
     },
 })

@@ -1,6 +1,9 @@
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { GroupStep } from '@buildkite/buildkite-sdk'
-import { ConcurrencyMethod, type PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import {
+    ConcurrencyMethod,
+    type PurpleStep,
+} from '@buildkite/buildkite-sdk/src/schema'
 import type { Context, EcosystemSuite, TestCase } from '../../lib'
 import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
@@ -72,7 +75,6 @@ ${testCase.failing ? 'set +e' : 'set -e'}
 ${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
-
 
         return {
             label,
