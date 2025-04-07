@@ -1,3 +1,5 @@
+import type { Maybe } from '../lib/types'
+
 /**
  * Pick keys from an object. Missing keys will be ignored.
  *
@@ -47,3 +49,6 @@ export const toSnakeCase = (str: string): string => {
         .replace(/\s+/g, '_')
         .toLowerCase()
 }
+
+export const truthy: (value: Maybe<string | false | 0>) => value is string =
+    Boolean as any
