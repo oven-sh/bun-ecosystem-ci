@@ -42,7 +42,10 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
 }
 
 type StepFactory = string | ((ctx: Context) => Maybe<string | Step>)
-const maybeRunFactory = (ctx: Context, factory: Maybe<StepFactory>): Maybe<string | Step> => {
+const maybeRunFactory = (
+    ctx: Context,
+    factory: Maybe<StepFactory>
+): Maybe<string | Step> => {
     if (typeof factory === 'string') return factory
     if (factory == null) return undefined
     return factory(ctx)
@@ -112,7 +115,9 @@ export function installAndTest(
 
                 const preinstall = maybeRunFactory(ctx, rest.preinstall)
                 const postinstall = maybeRunFactory(ctx, rest.postinstall)
-                const install = Step.from(maybeRunFactory(ctx, rest.install) ?? `${bun} install`, {
+                const install = Step.from(
+                    maybeRunFactory(ctx, rest.install) ?? `${bun} install`,
+                    {
                         cwd: packageName,
                     }
                 )
