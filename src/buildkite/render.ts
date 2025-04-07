@@ -1,6 +1,6 @@
 import { Pipeline } from '@buildkite/buildkite-sdk'
 import type { GroupStep } from '@buildkite/buildkite-sdk'
-import type { PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
+import { ConcurrencyMethod, type PurpleStep } from '@buildkite/buildkite-sdk/src/schema'
 import type { Context, EcosystemSuite, TestCase } from '../../lib'
 import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
@@ -80,6 +80,7 @@ ${scriptLines.join('\n')}
             env: testCase.env,
             command: script,
             concurrency_group: this.getConcurrencyKey(testCase, suiteName),
+            concurrency_method: ConcurrencyMethod.Eager,
             concurrency: 1,
         }
     }
