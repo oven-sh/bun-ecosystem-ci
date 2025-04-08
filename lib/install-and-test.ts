@@ -146,10 +146,10 @@ export function installAndTest(
                     testEnv ??= {}
                     testEnv['PATH'] = pathWithShimmedNodeBin
                 } else {
-                    shimNodeStep = Step.from(
-                        ['. ./.buildkite/shim-node.sh'],
-                        { name: 'Shim node binary', key: 'shim-node' }
-                    )
+                    shimNodeStep = Step.from(['. ./.buildkite/shim-node.sh'], {
+                        name: 'Shim node binary',
+                        key: 'shim-node',
+                    })
                 }
 
                 const testCase = TestCase.from(packageName, {
@@ -167,16 +167,16 @@ export function installAndTest(
                             key: 'create-bunfig',
                         }),
                         preinstall &&
-                        Step.from(preinstall, {
-                            cwd: packageName,
-                            key: 'preinstall',
-                        }),
+                            Step.from(preinstall, {
+                                cwd: packageName,
+                                key: 'preinstall',
+                            }),
                         install,
                         postinstall &&
-                        Step.from(postinstall, {
-                            cwd: packageName,
-                            key: 'postinstall',
-                        }),
+                            Step.from(postinstall, {
+                                cwd: packageName,
+                                key: 'postinstall',
+                            }),
                         shimNodeStep,
 
                         Step.from(testStep, {
