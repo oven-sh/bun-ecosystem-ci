@@ -4,7 +4,8 @@ import type { Context, EcosystemSuite } from './test-suite'
 import { TestCase, Step } from './test-suite'
 import * as steps from './steps'
 import type { Maybe } from './types'
-import { tmpDir } from '../src/util'
+import { tmpDirSync } from '../src/util'
+import { join } from 'node:path'
 
 type ContextData = {
     tmpdir?: string
@@ -76,6 +77,11 @@ export function installAndTest(
         const { bun } = ctx
         const defaultTestStep = `${bun} run test`
 
+        const tmpdir =
+            ctx.isLocal && ctx.runner == 'bun'
+                ? tmpDirSync('bun-ecosystem-' + name)
+                : undefined
+
         const cases = Object.entries(packages).reduce(
             (
                 cases: TestCase[],
@@ -131,14 +137,12 @@ export function installAndTest(
                 install.key = 'install-deps' // must be set after in case install() returns a Step
 
                 let shimNodeStep: Step
-                if (ctx.isLocal && ctx.runner === 'bun') {
-                    const tmpdir = ctx.data?.tmpdir
-                    assert(tmpdir)
-                    const nodepath = `${tmpdir}/node`
+                if (tmpdir) {
+                    const nodepath = join(tmpdir, 'node')
                     shimNodeStep = Step.from(
                         [
-                            `echo "throw new Error('Test suite tried to use node!');" > ${nodepath}`,
-                            'chmod a+x ${nodepath}',
+                            `printf "#!/bin/bash\\n echo 'Test suite tried to use node!'; \\nexit 1" > ${nodepath}`,
+                            `chmod +x ${nodepath}`,
                         ],
                         { name: 'Shim node binary', key: 'shim-node' }
                     )
@@ -200,12 +204,7 @@ export function installAndTest(
                 const { isLocal, runner } = ctx
                 if (isLocal && runner === 'bun') {
                     try {
-                        const [, tmpdir] = await Promise.all([
-                            fs.promises.mkdir('repos', { recursive: true }),
-                            tmpDir('bun-ecosystem-' + name),
-                        ])
-                        ctx.data ??= {}
-                        ctx.data.tmpdir = tmpdir
+                        await fs.promises.mkdir('repos', { recursive: true })
                     } catch (e) {
                         if (typeof e === 'object' && e != null && 'code' in e) {
                             const err = e as NodeJS.ErrnoException

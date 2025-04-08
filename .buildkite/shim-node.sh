@@ -4,7 +4,7 @@
 
 node_dir=$(mktemp -d)
 echo "making fake node dir: $node_dir"
-echo "throw new Error('Test suite tried to use node!');" > $node_dir/node
+printf "#!/bin/bash \necho 'Test case tried to use node!'; \nexit 1" > $node_dir/node
 chmod +x $node_dir/node
 chmod a+x $node_dir/node
 echo "export PATH=\"$node_dir:\$PATH\"" >> ~/.bashrc
