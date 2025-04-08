@@ -65,4 +65,12 @@ export const truthy: (value: Maybe<string | false | 0>) => value is string =
  * is created.
  */
 export const tmpDir = (prefix: string = 'ecosystem-ci'): Promise<string> =>
-    fs.promises.mkdtemp(path.join(os.tmpdir(), prefix))
+    fs.promises.mkdtemp(path.join(os.tmpdir(), prefix.replaceAll(/\s/g, '-')))
+
+/**
+ * Create a temporary directory
+ * @param prefix Optional prefix. 6 random characters will be appended to it.
+ * @returns absolute path to new temp dir.
+ */
+export const tmpDirSync = (prefix: string = 'ecosystem-ci'): string =>
+    fs.mkdtempSync(path.join(os.tmpdir(), prefix.replaceAll(/\s/g, '-')))

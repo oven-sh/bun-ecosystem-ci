@@ -113,6 +113,7 @@ async function renderSuites(
         isLocal: true,
         bun: options.bun,
         runner: options.format,
+        data: undefined,
     }
     // let absoluteFilepath: string
 
@@ -170,11 +171,12 @@ async function runAllTests({
     testFilter,
 }: RunTestOptions): Promise<void> {
     for (const [key, createSuite] of Object.entries(suites)) {
-        const localContext: Readonly<Context> = Object.freeze({
+        const localContext: Readonly<Context> = {
             isLocal: true,
             bun,
             runner: 'bun',
-        })
+            data: undefined,
+        }
 
         const suite = await TestSuite.reify(createSuite, localContext)
         suite.name ??= key
