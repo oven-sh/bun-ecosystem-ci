@@ -4,6 +4,11 @@ import type { Context, EcosystemSuite } from './test-suite'
 import { TestCase, Step } from './test-suite'
 import * as steps from './steps'
 import type { Maybe } from './types'
+import { tmpDir } from '../src/util'
+
+type ContextData = {
+    tmpdir?: string
+}
 
 interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
     /**
@@ -41,7 +46,9 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
     preload?: string | string[]
 }
 
-type StepFactory = string | ((ctx: Context) => Maybe<string | Step>)
+type StepFactory =
+    | string
+    | ((ctx: Context<ContextData>) => Maybe<string | Step>)
 const maybeRunFactory = (
     ctx: Context,
     factory: Maybe<StepFactory>
@@ -123,6 +130,32 @@ export function installAndTest(
                 )
                 install.key = 'install-deps' // must be set after in case install() returns a Step
 
+                let shimNodeStep: Step
+                let pathWithShimmedNodeBin: string | undefined
+                if (ctx.isLocal && ctx.runner === 'bun') {
+                    const tmpdir = ctx.data?.tmpdir
+                    assert(tmpdir)
+                    pathWithShimmedNodeBin = `${tmpdir}:${process.env.PATH}`
+                    const nodepath = `${tmpdir}/node`
+                    shimNodeStep = Step.from(
+                        [
+                            `echo "throw new Error('Test suite tried to use node!');" > ${nodepath}`,
+                            'chmod a+x ${nodepath}',
+                        ],
+                        { name: 'Shim node binary', key: 'shim-node' }
+                    )
+                } else {
+                    shimNodeStep = Step.from(
+                        [
+                            `node_dir=$(mktemp -d)`,
+                            'echo "throw new Error(\'Test suite tried to use node!\');" > ${node_dir}/node',
+                            'chmod a+x ${node_dir}/node',
+                            'export PATH="${node_dir}:${PATH}"',
+                        ],
+                        { name: 'Shim node binary', key: 'shim-node' }
+                    )
+                }
+
                 const testCase = TestCase.from(packageName, {
                     ...rest,
                     steps: [
@@ -148,6 +181,7 @@ export function installAndTest(
                                 cwd: packageName,
                                 key: 'postinstall',
                             }),
+                        shimNodeStep,
 
                         Step.from(testStep, {
                             cwd: packageName,
@@ -166,10 +200,16 @@ export function installAndTest(
         return {
             name,
             cases,
-            async beforeAll({ isLocal, runner }: Context) {
+            async beforeAll(ctx: Context<ContextData>) {
+                const { isLocal, runner } = ctx
                 if (isLocal && runner === 'bun') {
                     try {
-                        await fs.promises.mkdir('repos', { recursive: true })
+                        const [, tmpdir] = await Promise.all([
+                            fs.promises.mkdir('repos', { recursive: true }),
+                            tmpDir('bun-ecosystem-' + name),
+                        ])
+                        ctx.data ??= {}
+                        ctx.data.tmpdir = tmpdir
                     } catch (e) {
                         if (typeof e === 'object' && e != null && 'code' in e) {
                             const err = e as NodeJS.ErrnoException
