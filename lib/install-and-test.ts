@@ -148,8 +148,8 @@ export function installAndTest(
                     shimNodeStep = Step.from(
                         [
                             `node_dir=$(mktemp -d)`,
-                            'echo "throw new Error(\'Test suite tried to use node!\');" > ${node_dir}/node',
-                            'chmod a+x ${node_dir}/node',
+                            'echo "throw new Error(\'Test suite tried to use node!\');" > "$node_dir/node"',
+                            'chmod a+x "${node_dir}/node"',
                             'export PATH="${node_dir}:${PATH}"',
                         ],
                         { name: 'Shim node binary', key: 'shim-node' }
