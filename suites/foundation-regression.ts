@@ -29,7 +29,7 @@ export default installAndTest('foundation regression', {
     koa: {
         repository: 'https://github.com/koajs/koa',
         ref: 'master',
-        test: 'test'
+        test: 'test',
     },
     hono: {
         repository: 'https://github.com/honojs/hono',

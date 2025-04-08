@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import type { Maybe } from '../lib/types'
 
 /**
@@ -52,3 +55,14 @@ export const toSnakeCase = (str: string): string => {
 
 export const truthy: (value: Maybe<string | false | 0>) => value is string =
     Boolean as any
+
+// const uid = (): string => Math.floor(Math.random() * 32_000).toString(16)
+
+/**
+ * Create a temporary directory
+ * @param prefix Optional prefix. 6 random characters will be appended to it.
+ * @returns absolute path to new temp dir. Promise resolves after the directory
+ * is created.
+ */
+export const tmpDir = (prefix: string = 'ecosystem-ci'): Promise<string> =>
+    fs.promises.mkdtemp(path.join(os.tmpdir(), prefix))

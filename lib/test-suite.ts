@@ -10,7 +10,7 @@ import type { Maybe } from './types'
  * - {@link TestCase} -> job
  * - {@link Step} -> step lol
  */
-export interface Context {
+export interface Context<D = any> {
     /**
      * Are we running tests locally or in CI?
      */
@@ -20,17 +20,18 @@ export interface Context {
      * Name of bun binary. Use this instead of hardcoding `'bun'` into steps.
      */
     bun: string
+    data?: D
 }
 
-export type EcosystemSuite =
-    | TestSuite
-    | ((context: Readonly<Context>) => TestSuite | Promise<TestSuite>)
+export type EcosystemSuite<D = any> =
+    | TestSuite<D>
+    | ((context: Readonly<Context<D>>) => TestSuite<D> | Promise<TestSuite<D>>)
 
-export interface TestSuite {
+export interface TestSuite<D = any> {
     name?: string
     cases: TestCase[]
-    beforeAll?: (context: Readonly<Context>) => void | Promise<void>
-    afterAll?: (context: Readonly<Context>) => void | Promise<void>
+    beforeAll?: (context: Readonly<Context<D>>) => void | Promise<void>
+    afterAll?: (context: Readonly<Context<D>>) => void | Promise<void>
 }
 export namespace TestSuite {
     export async function reify(

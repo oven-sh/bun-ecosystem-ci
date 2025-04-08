@@ -59,7 +59,7 @@ describe(renderSuite, () => {
             expect(shellcheck).toBeTruthy()
             const filename = path.join(tmpdir, 'basic-step.sh')
             await Bun.write(filename, rendered.join('\n'))
-            const result = await Bun.spawn([shellcheck!, filename], {
+            const result = await Bun.spawn([shellcheck!, '-x', filename], {
                 stdout: 'inherit',
             })
             expect(await result.exited).toBe(0)
