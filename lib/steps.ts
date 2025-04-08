@@ -1,4 +1,6 @@
-import { Step } from './test-suite'
+import os from 'node:os'
+import fs from 'fs'
+import { Step, type Context } from './test-suite'
 
 type Checkout = {
     repository: string
@@ -32,3 +34,11 @@ fi
         key: `checkout-${packageName}`,
     })
 }
+
+// export const stubOutNode = (ctx: Context) => {
+//    if (ctx.isLocal && ctx.runner == 'bun')
+//     const dir = fs.mkdtempSync('bun-ecosystem-ci-' + uid())
+//    }
+// }
+
+// const uid = () => Math.floor(Math.random() * 32_000).toString(16)

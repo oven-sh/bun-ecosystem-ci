@@ -131,11 +131,9 @@ export function installAndTest(
                 install.key = 'install-deps' // must be set after in case install() returns a Step
 
                 let shimNodeStep: Step
-                let pathWithShimmedNodeBin: string | undefined
                 if (ctx.isLocal && ctx.runner === 'bun') {
                     const tmpdir = ctx.data?.tmpdir
                     assert(tmpdir)
-                    pathWithShimmedNodeBin = `${tmpdir}:${process.env.PATH}`
                     const nodepath = `${tmpdir}/node`
                     shimNodeStep = Step.from(
                         [
@@ -144,14 +142,12 @@ export function installAndTest(
                         ],
                         { name: 'Shim node binary', key: 'shim-node' }
                     )
+                    const pathWithShimmedNodeBin = `${tmpdir}:${testEnv?.PATH ?? process.env.PATH}`
+                    testEnv ??= {}
+                    testEnv['PATH'] = pathWithShimmedNodeBin
                 } else {
                     shimNodeStep = Step.from(
-                        [
-                            `node_dir=$(mktemp -d)`,
-                            'echo "throw new Error(\'Test suite tried to use node!\');" > "$node_dir/node"',
-                            'chmod a+x "${node_dir}/node"',
-                            'export PATH="${node_dir}:${PATH}"',
-                        ],
+                        ['. ./.buildkite/shim-node.sh'],
                         { name: 'Shim node binary', key: 'shim-node' }
                     )
                 }
@@ -171,16 +167,16 @@ export function installAndTest(
                             key: 'create-bunfig',
                         }),
                         preinstall &&
-                            Step.from(preinstall, {
-                                cwd: packageName,
-                                key: 'preinstall',
-                            }),
+                        Step.from(preinstall, {
+                            cwd: packageName,
+                            key: 'preinstall',
+                        }),
                         install,
                         postinstall &&
-                            Step.from(postinstall, {
-                                cwd: packageName,
-                                key: 'postinstall',
-                            }),
+                        Step.from(postinstall, {
+                            cwd: packageName,
+                            key: 'postinstall',
+                        }),
                         shimNodeStep,
 
                         Step.from(testStep, {
