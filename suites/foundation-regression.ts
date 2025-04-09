@@ -44,7 +44,7 @@ export default installAndTest('foundation regression', {
         repository: 'https://github.com/nestjs/nest.git',
         ref: 'master',
         postinstall: ({ bun }) => `${bun} run build`,
-        test: 'test',
+        test: steps.test.bun,
         failing: true,
     },
     /**
@@ -70,7 +70,7 @@ export default installAndTest('foundation regression', {
         repository: 'https://github.com/JoshGlazebrook/socks',
         ref: 'master',
         failing: true,
-        test: `test`,
+        test: steps.test.bun,
         postinstall: ({ bun }) => `${bun} run build`,
         testEnv: {
             NODE_ENV: 'test',
