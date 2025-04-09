@@ -4,9 +4,11 @@ import {
     ConcurrencyMethod,
     type PurpleStep,
 } from '@buildkite/buildkite-sdk/src/schema'
-import type { Context, EcosystemSuite, TestCase } from '../../lib'
+import type { Context, EcosystemSuite, Step, TestCase } from '../../lib'
 import { TestSuite } from '../../lib/test-suite'
 import * as shell from '../shell'
+import deepmerge from 'deepmerge'
+import { truthy } from '../util'
 
 export class PipelineFactory {
     static #ciAgent: Record<string, string> = {
@@ -57,16 +59,30 @@ export class PipelineFactory {
     public async addTestSuite(ecosystemSuite: EcosystemSuite): Promise<void> {
         // each suite maps to a group step
         const suite = await TestSuite.reify(ecosystemSuite, this.context)
-        const group: GroupStep = {
+        const group = {
             group: suite.name,
             steps: suite.cases.flatMap(testCase =>
                 this.renderTestCase(testCase, suite.name)
             ),
-        }
+        } satisfies GroupStep
+        group.steps.push(
+            { wait: '~', continue_on_failure: true },
+            {
+                label: 'Create annotations from JUnit reports',
+                plugins: {
+                    'junit-annotate#v2.6.0': {
+                        artifacts: '*.junit.xml',
+                    },
+                },
+            }
+        )
         this.pipeline.addStep(group)
     }
 
-    private renderTestCase(testCase: TestCase, suiteName?: string): PurpleStep {
+    private renderTestCase(
+        testCase: TestCase,
+        suiteName?: string
+    ): PurpleStep[] {
         const label = suiteName
             ? `${suiteName}: ${testCase.name}`
             : testCase.name
@@ -77,21 +93,45 @@ ${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
 
-        const plugins = {}
-        for (const step of testCase.steps) {
-            const plugin = step.buildkite?.plugins
-            if (plugins) Object.assign(plugins, plugin)
-        }
-        return {
-            label,
-            skip: testCase.skip,
-            env: testCase.env,
-            command: script,
-            plugins,
-            concurrency_group: this.getConcurrencyKey(testCase, suiteName),
-            concurrency_method: ConcurrencyMethod.Eager,
-            concurrency: 1,
-        }
+        // let buildkiteOptions = {}
+        // for (const step of testCase.steps) {
+        //     const buildkite = step.buildkite
+        //     if (buildkite) buildkiteOptions = deepmerge(buildkiteOptions, buildkite)
+        // }
+        const buildkiteOptions = testCase.steps
+            .map(step => step.buildkite)
+            .filter(truthy)
+            .reduce(
+                (acc, el) => deepmerge(acc, el),
+                {} as Step.BuildkiteOptions
+            )
+        const testKey = `${testCase.name}-test`
+        const testSteps: PurpleStep[] = [
+            {
+                label,
+                key: testKey,
+                skip: testCase.skip,
+                env: testCase.env,
+                command: script,
+                plugins: buildkiteOptions.plugins,
+                artifact_paths: buildkiteOptions.artifactPaths,
+                concurrency_group: this.getConcurrencyKey(testCase, suiteName),
+                concurrency_method: ConcurrencyMethod.Eager,
+                concurrency: 1,
+            },
+        ]
+        // if (!testCase.skip && buildkiteOptions.artifactPaths?.length) {
+        //     testSteps.push(
+        //         {
+        //             wait: '~',
+        //             continue_on_failure: true,
+        //         },
+        //         {
+        //             label: 'Create annotations',
+        //         }
+        //     )
+        // }
+        return testSteps
     }
 
     private getConcurrencyKey(testCase: TestCase, suiteName?: string): string {

@@ -23,13 +23,13 @@ export default installAndTest('foundation regression', {
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
-        test: steps.test.bun,
+        test: steps.test.bun('test-express'),
         failing: true,
     },
     koa: {
         repository: 'https://github.com/koajs/koa',
         ref: 'master',
-        test: steps.test.bun,
+        test: steps.test.bun('test-koa'),
     },
     hono: {
         repository: 'https://github.com/honojs/hono',
@@ -38,13 +38,13 @@ export default installAndTest('foundation regression', {
     elysia: {
         repository: 'https://github.com/elysiajs/elysia.git',
         postinstall: ({ bun }) => `${bun} run build`,
-        test: steps.test.bun,
+        test: steps.test.bun('test-elysia'),
     },
     nestjs: {
         repository: 'https://github.com/nestjs/nest.git',
         ref: 'master',
         postinstall: ({ bun }) => `${bun} run build`,
-        test: steps.test.bun,
+        test: steps.test.bun('test-nestjs'),
         failing: true,
     },
     /**
@@ -70,7 +70,7 @@ export default installAndTest('foundation regression', {
         repository: 'https://github.com/JoshGlazebrook/socks',
         ref: 'master',
         failing: true,
-        test: steps.test.bun,
+        test: steps.test.bun('test-socks'),
         postinstall: ({ bun }) => `${bun} run build`,
         testEnv: {
             NODE_ENV: 'test',

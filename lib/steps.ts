@@ -39,18 +39,23 @@ export namespace test {
     /**
      * `bun test`
      */
-    export const bun = ({ bun }: Context) =>
-        Step.from(
-            `${bun} test --reporter=junit --reporter-outfile=bun-test.junit.xml`,
-            {
-                name: 'bun test',
-                buildkite: {
-                    plugins: {
-                        'junit-annotate#v2.6.0': {
-                            artifacts: 'bun-test.junit.xml',
-                        },
+    export const bun =
+        (reportName = 'bun-test') =>
+        ({ bun }: Context) => {
+            const outfile = `${reportName}.junit.xml`
+            return Step.from(
+                `${bun} test --reporter=junit --reporter-outfile=${outfile}`,
+                {
+                    name: 'bun test',
+                    buildkite: {
+                        artifactPaths: [outfile],
+                        // plugins: {
+                        //     'junit-annotate#v2.6.0': {
+                        //         artifacts: 'bun-test.junit.xml',
+                        //     },
+                        // },
                     },
-                },
-            }
-        )
+                }
+            )
+        }
 }

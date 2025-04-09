@@ -163,16 +163,19 @@ export interface Step {
     /**
      * Buildkite-specific configuration. These aren't used for other kinds of runners.
      */
-    buildkite?: {
+    buildkite?: Step.BuildkiteOptions
+}
+export namespace Step {
+    export type Options = Partial<Omit<Step, 'run'>>
+
+    export interface BuildkiteOptions {
         /**
          * [Buildkite plugins](https://buildkite.com/docs/pipelines/integrations/plugins)
          * to add to the step.
          */
         plugins?: Record<string, any>
+        artifactPaths?: string[]
     }
-}
-export namespace Step {
-    export type Options = Partial<Omit<Step, 'run'>>
 
     export function from(
         command: string | string[] | Step,

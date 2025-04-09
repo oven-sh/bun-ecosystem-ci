@@ -53,7 +53,7 @@ export const toSnakeCase = (str: string): string => {
         .toLowerCase()
 }
 
-export const truthy: (value: Maybe<string | false | 0>) => value is string =
+export const truthy: <T>(value: Maybe<T | false | 0>) => value is T =
     Boolean as any
 
 // const uid = (): string => Math.floor(Math.random() * 32_000).toString(16)
