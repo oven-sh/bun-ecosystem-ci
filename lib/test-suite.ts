@@ -184,7 +184,9 @@ export namespace Step {
                 if (value == null) continue
                 command[k] ??= value as any
             }
+            return command
         }
+
         return {
             name: rest.name,
             run: Array.isArray(command)
