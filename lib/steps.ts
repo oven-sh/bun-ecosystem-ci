@@ -41,13 +41,13 @@ export namespace test {
      */
     export const bun = ({ bun }: Context) =>
         Step.from(
-            `${bun} test --reporter=junit --reporter-outfile=tmp/bun-test.junit.xml`,
+            `${bun} test --reporter=junit --reporter-outfile=bun-test.junit.xml`,
             {
                 name: 'bun test',
                 buildkite: {
                     plugins: {
                         'junit-annotate#v2.6.0': {
-                            artifacts: 'tmp/bun-test.junit.xml',
+                            artifacts: 'bun-test.junit.xml',
                         },
                     },
                 },
