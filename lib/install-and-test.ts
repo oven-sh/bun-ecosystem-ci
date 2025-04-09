@@ -106,7 +106,7 @@ export function installAndTest(
                         testStep = `${bun} ${test}`
                         break
                     case 'function':
-                        testStep = maybeRunFactory(ctx, test) ?? defaultTestStep
+                        testStep = test(ctx) ?? defaultTestStep
                         break
                     case 'undefined':
                         testStep = defaultTestStep

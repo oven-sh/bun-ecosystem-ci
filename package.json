@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@buildkite/buildkite-sdk": "^0.2.0",
-    "commander": "^13.1.0"
+    "commander": "^13.1.0",
+    "deepmerge": "^4.3.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
