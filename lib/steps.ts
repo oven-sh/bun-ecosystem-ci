@@ -42,7 +42,8 @@ export namespace test {
     export const bun =
         (reportName = 'bun-test') =>
         ({ bun }: Context) => {
-            const outfile = `${reportName}.junit.xml`
+            // TODO: determine OS tmpdir
+            const outfile = `/tmp/${reportName}.junit.xml`
             return Step.from(
                 `${bun} test --reporter=junit --reporter-outfile=${outfile}`,
                 {
