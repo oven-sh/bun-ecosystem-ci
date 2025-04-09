@@ -6,6 +6,7 @@
       "dependencies": {
         "@buildkite/buildkite-sdk": "^0.2.0",
         "commander": "^13.1.0",
+        "deepmerge": "^4.3.1",
       },
       "devDependencies": {
         "@types/bun": "^1.2.8",
@@ -45,6 +46,8 @@
     "bun-types": ["bun-types@1.2.7", "", { "dependencies": { "@types/node": "*", "@types/ws": "*" } }, "sha512-P4hHhk7kjF99acXqKvltyuMQ2kf/rzIw3ylEDpCxDS9Xa0X0Yp/gJu/vDCucmWpiur5qJ0lwB2bWzOXa2GlHqA=="],
 
     "commander": ["commander@13.1.0", "", {}, "sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw=="],
+
+    "deepmerge": ["deepmerge@4.3.1", "", {}, "sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A=="],
 
     "oxlint": ["oxlint@0.15.6", "", { "optionalDependencies": { "@oxlint/darwin-arm64": "0.15.6", "@oxlint/darwin-x64": "0.15.6", "@oxlint/linux-arm64-gnu": "0.15.6", "@oxlint/linux-arm64-musl": "0.15.6", "@oxlint/linux-x64-gnu": "0.15.6", "@oxlint/linux-x64-musl": "0.15.6", "@oxlint/win32-arm64": "0.15.6", "@oxlint/win32-x64": "0.15.6" }, "bin": { "oxlint": "bin/oxlint", "oxc_language_server": "bin/oxc_language_server" } }, "sha512-LiDI0mIzvnL/oQq7AyAganWAKtk/RaiOKdACnzeJDe64gWp7c+0y3T554IvfWd/9kVt5awlvyg5eRRp67PaxNA=="],
 

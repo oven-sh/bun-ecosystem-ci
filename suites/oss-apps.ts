@@ -1,4 +1,4 @@
-import { installAndTest } from '../lib'
+import { installAndTest, Step } from '../lib'
 
 export default installAndTest('oss applications', {
     'next-starter': {
@@ -18,5 +18,14 @@ export default installAndTest('oss applications', {
         repository: 'https://github.com/onlook-dev/onlook',
         ref: 'v0.2.24',
         postinstall: ({ bun }) => `${bun} run build`,
+        test: ctx =>
+            Step.from(
+                `${ctx.bun} run test --reporter=junit --reporter-outfile=/tmp/onlook-test.junit.xml`,
+                {
+                    buildkite: {
+                        artifactPaths: ['/tmp/onlook-test.junit.xml'],
+                    },
+                }
+            ),
     },
 })
