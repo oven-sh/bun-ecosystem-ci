@@ -159,6 +159,16 @@ export interface Step {
      * Current working directory to use when running commands for this step.
      */
     cwd?: string
+    /**
+     * Buildkite-specific configuration. These aren't used for other kinds of runners.
+     */
+    buildkite?: {
+        /**
+         * [Buildkite plugins](https://buildkite.com/docs/pipelines/integrations/plugins)
+         * to add to the step.
+         */
+        plugins?: Record<string, any>
+    }
 }
 export namespace Step {
     export type Options = Partial<Omit<Step, 'run'>>

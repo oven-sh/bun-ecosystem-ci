@@ -5,7 +5,7 @@
  * By foundational, we me mean packages that may or may not be popular
  */
 
-import { installAndTest } from '../lib'
+import { installAndTest, steps } from '../lib'
 
 export default installAndTest('foundation regression', {
     express: {
@@ -23,13 +23,13 @@ export default installAndTest('foundation regression', {
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
-        test: 'test', // `bun test`
+        test: steps.test.bun,
         failing: true,
     },
     koa: {
         repository: 'https://github.com/koajs/koa',
         ref: 'master',
-        test: 'test',
+        test: steps.test.bun,
     },
     hono: {
         repository: 'https://github.com/honojs/hono',
@@ -38,7 +38,7 @@ export default installAndTest('foundation regression', {
     elysia: {
         repository: 'https://github.com/elysiajs/elysia.git',
         postinstall: ({ bun }) => `${bun} run build`,
-        test: 'test',
+        test: steps.test.bun,
     },
     nestjs: {
         repository: 'https://github.com/nestjs/nest.git',

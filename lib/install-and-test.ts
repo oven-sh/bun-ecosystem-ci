@@ -25,7 +25,7 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
      * How to run tests. "bun" is prepended implicitly.
      * @default "run test"
      */
-    test?: string | string[]
+    test?: string | string[] | StepFactory
     /**
      * Environment variables to set **only** for the test step
      */
@@ -50,6 +50,7 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
 type StepFactory =
     | string
     | ((ctx: Context<ContextData>) => Maybe<string | Step>)
+
 const maybeRunFactory = (
     ctx: Context,
     factory: Maybe<StepFactory>
@@ -98,17 +99,27 @@ export function installAndTest(
                     },
                 ]
             ) => {
-                let testStep: string = defaultTestStep
-                if (typeof test === 'string') {
-                    assert(test.length, `test step cannot be empty`)
-                    testStep = `${bun} ${test}`
-                } else if (Array.isArray(test)) {
-                    assert(test.length, `test step cannot be empty`)
-                    assert.notEqual(test[0], 'bun')
-                    const cleanTests = test.map(arg =>
-                        arg.includes(' ') ? `"${arg}"` : arg
-                    )
-                    testStep = [bun, ...cleanTests].join(' ')
+                let testStep: Step | string = defaultTestStep
+                switch (typeof test) {
+                    case 'string':
+                        assert(test.length, `test step cannot be empty`)
+                        testStep = `${bun} ${test}`
+                        break
+                    case 'function':
+                        testStep = maybeRunFactory(ctx, test) ?? defaultTestStep
+                        break
+                    default:
+                        assert(
+                            Array.isArray(test) && test.length,
+                            `test step cannot be empty`
+                        )
+                        assert.notEqual(test[0], 'bun')
+                        const cleanTests = test.map(arg =>
+                            arg.includes(' ') ? `"${arg}"` : arg
+                        )
+                        testStep = [bun, ...cleanTests].join(' ')
+
+                        break
                 }
 
                 // bunfig.toml contents

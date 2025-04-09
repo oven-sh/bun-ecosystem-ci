@@ -35,10 +35,23 @@ fi
     })
 }
 
-// export const stubOutNode = (ctx: Context) => {
-//    if (ctx.isLocal && ctx.runner == 'bun')
-//     const dir = fs.mkdtempSync('bun-ecosystem-ci-' + uid())
-//    }
-// }
-
-// const uid = () => Math.floor(Math.random() * 32_000).toString(16)
+export namespace test {
+    /**
+     * `bun test`
+     */
+    export const bun = ({ bun }: Context) =>
+        Step.from(
+            `${bun} test --reporter=junit --reporter-outfile=tmp/bun-test.junit.xml`,
+            {
+                key: 'test',
+                name: 'bun test',
+                buildkite: {
+                    plugins: {
+                        'junit-annotate#v2.6.0': {
+                            artifacts: 'tmp/bun-test.junit.xml',
+                        },
+                    },
+                },
+            }
+        )
+}
