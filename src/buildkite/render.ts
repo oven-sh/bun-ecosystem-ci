@@ -77,11 +77,17 @@ ${this.beforeEachCase.join('\n')}
 ${scriptLines.join('\n')}
 `.trim()
 
+        const plugins = {}
+        for (const step of testCase.steps) {
+            const plugin = step.buildkite?.plugins
+            if (plugins) Object.assign(plugins, plugin)
+        }
         return {
             label,
             skip: testCase.skip,
             env: testCase.env,
             command: script,
+            plugins,
             concurrency_group: this.getConcurrencyKey(testCase, suiteName),
             concurrency_method: ConcurrencyMethod.Eager,
             concurrency: 1,
