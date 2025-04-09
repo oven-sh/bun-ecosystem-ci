@@ -108,11 +108,19 @@ export function installAndTest(
                     case 'function':
                         testStep = maybeRunFactory(ctx, test) ?? defaultTestStep
                         break
-                    default:
+                    case 'undefined':
+                        testStep = defaultTestStep
+                        break
+                    case 'object':
+                        if (test == null) {
+                            testStep = defaultTestStep
+                            break
+                        }
                         assert(
-                            Array.isArray(test) && test.length,
-                            `test step cannot be empty`
+                            Array.isArray(test),
+                            `test step must be an array. Got a ${typeof test}: ${test}`
                         )
+                        assert(test.length, `test step cannot be empty`)
                         assert.notEqual(test[0], 'bun')
                         const cleanTests = test.map(arg =>
                             arg.includes(' ') ? `"${arg}"` : arg
@@ -120,6 +128,10 @@ export function installAndTest(
                         testStep = [bun, ...cleanTests].join(' ')
 
                         break
+                    default:
+                        throw new TypeError(
+                            `'test' step must be a string, string[], or step factory. Got ${typeof test}: ${test}`
+                        )
                 }
 
                 // bunfig.toml contents
