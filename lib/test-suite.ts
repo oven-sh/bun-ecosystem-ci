@@ -177,7 +177,14 @@ export namespace Step {
         command: string | string[] | Step,
         rest: Options = {}
     ): Step {
-        if (Step.is(command)) return command
+        if (Step.is(command)) {
+            for (const key in rest) {
+                const k = key as keyof Options
+                const value = rest[k]
+                if (value == null) continue
+                command[k] ??= value as any
+            }
+        }
         return {
             name: rest.name,
             run: Array.isArray(command)

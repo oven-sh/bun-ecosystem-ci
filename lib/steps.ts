@@ -43,7 +43,6 @@ export namespace test {
         Step.from(
             `${bun} test --reporter=junit --reporter-outfile=tmp/bun-test.junit.xml`,
             {
-                key: 'test',
                 name: 'bun test',
                 buildkite: {
                     plugins: {
