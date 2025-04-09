@@ -113,8 +113,8 @@ export namespace TestCase {
             failing = false,
             skip = false,
         } = Array.isArray(stepsOrOptions)
-                ? { steps: stepsOrOptions }
-                : stepsOrOptions
+            ? { steps: stepsOrOptions }
+            : stepsOrOptions
 
         return {
             name,
@@ -184,10 +184,13 @@ export namespace Step {
                 const value = rest[k]
                 if (value == null) continue
                 const existing = command[k]
-                if (existing && typeof existing === 'object' && typeof value === 'object') {
+                if (
+                    existing &&
+                    typeof existing === 'object' &&
+                    typeof value === 'object'
+                ) {
                     command[k] = deepmerge(existing as any, value as any) as any
                 } else {
-
                     command[k] ||= value as any
                 }
             }
@@ -199,10 +202,10 @@ export namespace Step {
             run: Array.isArray(command)
                 ? command
                 : command
-                    .trim()
-                    .split('\n')
-                    .map(s => s.trim())
-                    .filter(Boolean),
+                      .trim()
+                      .split('\n')
+                      .map(s => s.trim())
+                      .filter(Boolean),
         }
     }
 
