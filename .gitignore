@@ -13,12 +13,13 @@ lerna-debug.log*
 # Caches
 .cache
 
-# Code Coverage 
+# Code Coverage & Test Reports
 
 lib-cov
 coverage
 *.lcov
 .nyc_output
+*.junit.xml
 
 # Dependencies
 node_modules/

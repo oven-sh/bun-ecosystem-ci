@@ -1,5 +1,3 @@
-import os from 'node:os'
-import fs from 'fs'
 import { Step, type Context } from './test-suite'
 
 type Checkout = {

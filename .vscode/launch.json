@@ -33,6 +33,17 @@
             "type": "bun",
             "internalConsoleOptions": "neverOpen",
             "request": "launch",
+            "name": "[bun] render buildkite pipeline",
+            "program": "${workspaceFolder}/src/index.ts",
+            "args": ["render", "--format", "buildkite"],
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "watchMode": false
+        },
+        {
+            "type": "bun",
+            "internalConsoleOptions": "neverOpen",
+            "request": "launch",
             "name": "[bun] render --format buildkite",
             "program": "${workspaceFolder}/src/index.ts",
             "cwd": "${workspaceFolder}",
