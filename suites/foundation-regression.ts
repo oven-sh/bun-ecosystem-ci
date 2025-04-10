@@ -11,15 +11,15 @@ export default installAndTest('foundation regression', {
     express: {
         repository: 'https://github.com/expressjs/express',
         ref: 'master',
-        // test: `--bun run test`,
+        test: `--bun run test`,
         failing: true,
-        // takes like an hour b/c of bug in setTimeout or something
-        // skip: true,
-        test: 'test ./test/*.js',
-        preload: [
-            import.meta.require.resolve('@shim/mocha'),
-            './test/support/env.js',
-        ],
+        // some cases hang
+        skip: true,
+        // test: 'test ./test/*.js',
+        // preload: [
+        //     import.meta.require.resolve('@shim/mocha'),
+        //     './test/support/env.js',
+        // ],
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
