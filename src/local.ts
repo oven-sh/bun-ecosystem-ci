@@ -16,6 +16,7 @@ import { processJUnitReport } from './xml'
 import { version } from '../package.json'
 
 const inheritEnvVarNames = ['PATH', 'CI', 'TTY', 'BUN_DEBUG_QUIET_LOGS', 'TERM']
+const { CI } = process.env
 
 export default function main(argv: string[]): void {
     const program = new Command().name('ecosystem-ci').version(version)
@@ -136,7 +137,7 @@ async function renderSuites(
     options: RenderOptions
 ): Promise<void> {
     const ctx: Context = {
-        isLocal: true,
+        isLocal: !CI,
         bun: options.bun,
         runner: options.format,
         data: undefined,
