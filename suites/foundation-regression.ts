@@ -6,6 +6,7 @@
  */
 
 import { installAndTest, steps } from '../lib'
+import { usesPnpm } from '../lib/install-and-test'
 
 export default installAndTest('foundation regression', {
     express: {
@@ -47,6 +48,12 @@ export default installAndTest('foundation regression', {
         test: steps.test.bun('test-nestjs'),
         failing: true,
     },
+    nextjs: {
+        repository: 'https://github.com/vercel/next.js',
+        ref: 'canary',
+        test: '--bun run test',
+        postinstall: ({ bun }) => `${bun} run build`,
+    },
     /**
      * it's got like 116m downloads
      * https://www.npmjs.com/package/minipass
@@ -66,6 +73,11 @@ export default installAndTest('foundation regression', {
         failing: true,
         skip: true, // hangs in CI
     },
+    'graphql-yoga': {
+        repository: 'https://github.com/graphql-hive/graphql-yoga',
+        ...usesPnpm(),
+        test: steps.test.bun('test-graphql-yoga'),
+    },
     socks: {
         repository: 'https://github.com/JoshGlazebrook/socks',
         ref: 'master',
@@ -78,10 +90,17 @@ export default installAndTest('foundation regression', {
     },
     prisma: {
         repository: 'https://github.com/prisma/prisma',
-        preinstall: ({ isLocal, bun }) =>
-            isLocal ? undefined : `${bun} i -g pnpm`,
-        install: 'pnpm i',
-        postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
+        ...usesPnpm(),
         skip: true, // relies on gh actions. TODO: polyfill w buildkite env vars
     },
+    // hangs
+    // 'date-fns': {
+    //     repository: 'https://github.com/date-fns/date-fns',
+    //     test: '--bun vitest',
+    // }
+    vitest: {
+        repository: 'https://github.com/vitest-dev/vitest',
+        ...usesPnpm(),
+        test: '--bun run test',
+    }
 })
