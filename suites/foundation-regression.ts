@@ -55,6 +55,9 @@ export default installAndTest('foundation regression', {
         repository: 'https://github.com/isaacs/minipass',
         test: '--bun tap',
         failing: true,
+        // uses tap @tapjs/* for testing, which uses node:v8 Serializer, which
+        // isn't implemented yet
+        skip: true, 
     },
 
     // these guys use bun
@@ -70,6 +73,7 @@ export default installAndTest('foundation regression', {
         repository: 'https://github.com/JoshGlazebrook/socks',
         ref: 'master',
         failing: true,
+        skip: true,
         test: steps.test.bun('test-socks'),
         postinstall: ({ bun }) => `${bun} run build`,
         testEnv: {
