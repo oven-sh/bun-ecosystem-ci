@@ -111,5 +111,17 @@ describe(renderStep, () => {
             })
             expect(await result.exited).toBe(0)
         })
+    }) // </ when a basic step is rendered>
+
+    it('respects `step.timeout`', () => {
+        const actual = renderStep(
+            Step.from('echo "hello world"', {
+                timeout: 1000,
+            })
+        )
+        expect(actual).not.toBeEmpty()
+        const rendered = actual.join('\n')
+        expect(rendered).toMatchSnapshot()
+        expect(rendered).toMatch(/timeout.*1000/)
     })
 })

@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import type { Step, TestCase, TestSuite } from '../lib'
+import type { Step, TestCase, TestSuite, Maybe } from '../lib'
 
 /**
  * Render a test suite into a shell script.
@@ -76,7 +76,7 @@ export function renderStep(step: Step): string[] {
 
     const lines = [`# Step: ${name ?? [run[0]]}`]
     if (name) lines.push(`echo '${name.replaceAll("'", "\\'")}'`)
-    lines.push(...subshell(indent(cmds)))
+    lines.push(...withTimeout(step.timeout)(subshell(indent(cmds))))
 
     return lines
 }
@@ -101,3 +101,12 @@ const withDir = (dir: string | undefined) =>
     dir ? wrap(`pushd ${dir}`, 'popd') : reifyLines //wrap('', '')
 /** Runs commands in a subshell */
 const subshell = wrap('(', ')')
+const withTimeout =
+    (timeout: Maybe<number>) =>
+    (lines: string[]): string[] => {
+        if (timeout == null || !lines.length) return lines
+        assert(timeout > 0)
+        assert(lines.length > 0)
+        lines[0] = `timeout --verbose --kill-after=${timeout * 2} ${timeout} ${lines[0]}`
+        return lines
+    }
