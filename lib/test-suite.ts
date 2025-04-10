@@ -1,3 +1,4 @@
+import deepmerge from 'deepmerge'
 import type { Maybe } from './types'
 
 /**
@@ -159,17 +160,48 @@ export interface Step {
      * Current working directory to use when running commands for this step.
      */
     cwd?: string
+    /**
+     * Buildkite-specific configuration. These aren't used for other kinds of runners.
+     */
+    buildkite?: Step.BuildkiteOptions
 }
 export namespace Step {
     export type Options = Partial<Omit<Step, 'run'>>
+
+    export interface BuildkiteOptions {
+        /**
+         * [Buildkite plugins](https://buildkite.com/docs/pipelines/integrations/plugins)
+         * to add to the step.
+         */
+        plugins?: Record<string, any>
+        artifactPaths?: string[]
+    }
 
     export function from(
         command: string | string[] | Step,
         rest: Options = {}
     ): Step {
-        if (Step.is(command)) return command
+        if (Step.is(command)) {
+            for (const key in rest) {
+                const k = key as keyof Options
+                const value = rest[k]
+                if (value == null) continue
+                const existing = command[k]
+                if (
+                    existing &&
+                    typeof existing === 'object' &&
+                    typeof value === 'object'
+                ) {
+                    command[k] = deepmerge(existing as any, value as any) as any
+                } else {
+                    command[k] ||= value as any
+                }
+            }
+            return command
+        }
+
         return {
-            name: rest.name,
+            ...rest,
             run: Array.isArray(command)
                 ? command
                 : command
@@ -177,8 +209,6 @@ export namespace Step {
                       .split('\n')
                       .map(s => s.trim())
                       .filter(Boolean),
-            env: rest.env,
-            cwd: rest.cwd,
         }
     }
 
