@@ -57,7 +57,7 @@ export default installAndTest('foundation regression', {
         failing: true,
         // uses tap @tapjs/* for testing, which uses node:v8 Serializer, which
         // isn't implemented yet
-        skip: true, 
+        skip: true,
     },
 
     // these guys use bun
