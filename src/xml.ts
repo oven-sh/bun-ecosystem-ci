@@ -24,8 +24,13 @@ export async function processJUnitReport(
             .text()
             .then(hash => hash.trim())
     } catch (e) {
+        let msg = 'Error getting commit hash'
+        if (e instanceof Bun.ShellError) {
+            msg += `: ${e.stderr.toString('utf8')}`
+        }
         // log error, but keep going
-        console.error('Error getting commit hash:', e)
+        console.error(msg)
+        console.error(e)
     }
     const reportRaw = await Bun.file(reportPath).text()
 
