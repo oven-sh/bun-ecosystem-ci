@@ -2,6 +2,7 @@ import assert from 'assert'
 import path from 'path'
 import { Command } from 'commander'
 import {
+    Step,
     TestSuite,
     type Context,
     type EcosystemSuite,
@@ -214,7 +215,8 @@ async function runAllTests({
 
 async function runCase(testCase: TestCase): Promise<number> {
     for (const step of testCase.steps) {
-        const { run, env: stepEnv, cwd, name } = step
+        Step.validate(step)
+        const { run, env: stepEnv, cwd, name, timeout } = step
         const env = Object.assign(
             pick(process.env, inheritEnvVarNames),
             testCase.env,
@@ -226,6 +228,7 @@ async function runCase(testCase: TestCase): Promise<number> {
             stdio: ['pipe', 'inherit', 'inherit'],
             cwd,
             env,
+            timeout,
         })
         for (const cmd of run) {
             child.stdin.write(cmd + '\n')

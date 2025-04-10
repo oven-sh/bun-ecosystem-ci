@@ -1,0 +1,8 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renderStep respects \`step.timeout\` 1`] = `
+"# Step: echo "hello world"
+timeout --verbose --kill-after=2000 1000 (
+  echo "hello world"
+)"
+`;

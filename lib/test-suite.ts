@@ -1,5 +1,6 @@
 import deepmerge from 'deepmerge'
 import type { Maybe } from './types'
+import { strict as assert } from 'node:assert'
 
 /**
  * Test suites have similar checks over a bunch of cases. Each case normally
@@ -161,6 +162,13 @@ export interface Step {
      */
     cwd?: string
     /**
+     * Timeout for this step in milliseconds. If the step takes longer than
+     * this, it fails. By default, no timeout is set.
+     *
+     * @min 1
+     */
+    timeout?: number
+    /**
      * Buildkite-specific configuration. These aren't used for other kinds of runners.
      */
     buildkite?: Step.BuildkiteOptions
@@ -224,5 +232,15 @@ export namespace Step {
         }
 
         return true
+    }
+
+    export function validate(step: Step): void {
+        assert(step.run?.length, 'Step must have at least one command')
+        if (step.timeout != null) {
+            assert(
+                step.timeout > 0,
+                `Timeout must be greater than 0, got ${step.timeout}`
+            )
+        }
     }
 }
