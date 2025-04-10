@@ -1,4 +1,4 @@
-import { installAndTest, Step } from '../lib'
+import { installAndTest, Step, steps } from '../lib'
 import { usesPnpm } from '../lib/install-and-test'
 
 export default installAndTest('oss applications', {
@@ -29,5 +29,6 @@ export default installAndTest('oss applications', {
     undb: {
         repository: 'https://github.com/undb-io/undb',
         ref: 'develop',
+        test: steps.test.bun('test-undb'),
     },
 })
