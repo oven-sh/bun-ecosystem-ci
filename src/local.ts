@@ -89,7 +89,7 @@ export default function main(argv: string[]): void {
         .command('process-report')
         .description('prepare a JUnit report (xml) for reporting to robobun')
         .addOption(bunOpt)
-        .option('r, --report <report>', 'Path to the report file')
+        .option('-r, --report <report>', 'Path to the report file')
         .option('-s, --suite <name>', 'Display name of the test suite')
         .action(async function processReport(cmd): Promise<void> {
             const { report: reportPath, suite: suiteName } = cmd
