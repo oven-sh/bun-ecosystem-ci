@@ -1,4 +1,5 @@
-import { installAndTest, Step } from '../lib'
+import { installAndTest, Step, steps } from '../lib'
+import { usesPnpm } from '../lib/install-and-test'
 
 export default installAndTest('oss applications', {
     'next-starter': {
@@ -6,10 +7,7 @@ export default installAndTest('oss applications', {
     },
     remotion: {
         repository: 'https://github.com/remotion-dev/remotion',
-        postinstall: ({ bun }) => `${bun} run build`,
-        install: 'pnpm install',
-        preinstall: ({ isLocal, bun }) =>
-            isLocal ? undefined : `${bun} install -g pnpm`,
+        ...usesPnpm(),
         failing: true,
         skip: true, // FIXME
     },
@@ -27,5 +25,10 @@ export default installAndTest('oss applications', {
                     },
                 }
             ),
+    },
+    undb: {
+        repository: 'https://github.com/undb-io/undb',
+        ref: 'develop',
+        test: steps.test.bun('test-undb'),
     },
 })
