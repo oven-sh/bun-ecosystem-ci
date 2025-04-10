@@ -23,7 +23,7 @@ export default installAndTest('foundation regression', {
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
-        test: steps.test.bun('express'),
+        test: steps.test.bun('fastify'),
         failing: true,
     },
     koa: {
