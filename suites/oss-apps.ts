@@ -1,4 +1,5 @@
 import { installAndTest } from '../lib'
+import { usesPnpm } from '../lib/install-and-test'
 
 export default installAndTest('oss applications', {
     'next-starter': {
@@ -6,10 +7,7 @@ export default installAndTest('oss applications', {
     },
     remotion: {
         repository: 'https://github.com/remotion-dev/remotion',
-        postinstall: ({ bun }) => `${bun} run build`,
-        install: 'pnpm install',
-        preinstall: ({ isLocal, bun }) =>
-            isLocal ? undefined : `${bun} install -g pnpm`,
+        ...usesPnpm(),
         failing: true,
         skip: true, // FIXME
     },
@@ -18,5 +16,9 @@ export default installAndTest('oss applications', {
         repository: 'https://github.com/onlook-dev/onlook',
         ref: 'v0.2.24',
         postinstall: ({ bun }) => `${bun} run build`,
+    },
+    undb: {
+        repository: 'https://github.com/undb-io/undb',
+        ref: 'develop',
     },
 })

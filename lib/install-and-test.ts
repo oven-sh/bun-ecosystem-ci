@@ -217,3 +217,11 @@ export function installAndTest(
         }
     }
 }
+
+export const usesPnpm = () =>
+    ({
+        postinstall: ({ bun }) => `${bun} run build`,
+        install: 'pnpm install',
+        preinstall: ({ isLocal, bun }) =>
+            isLocal ? undefined : `${bun} install -g pnpm`,
+    }) satisfies Partial<Package>
