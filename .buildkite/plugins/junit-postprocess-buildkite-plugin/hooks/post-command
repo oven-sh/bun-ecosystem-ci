@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -euo pipefail
+
+
+bun run start process-junit \
+    --report $BUILDKITE_PLUGIN_JUNIT_POSTPROCESS_REPORT_PATH \
+    --suite $BUILDKITE_PLUGIN_JUNIT_POSTPROCESS_SUITE_NAME

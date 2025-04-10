@@ -1,0 +1,16 @@
+name: JUnit Postprocess
+description: Clean up JUnit XML report files
+author: Don Isaac
+requirements: []
+configuration:
+  properties:
+    report-path:
+      type: string
+      description: path to junit report file
+      example: tmp/some-test.junit.xml
+    suite-name:
+      type: string
+      description: override the suite name from `bun test` to this.
+  required:
+    - report-path
+    - suite-name

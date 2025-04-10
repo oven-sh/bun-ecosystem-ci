@@ -50,11 +50,13 @@ export namespace test {
                     name: 'bun test',
                     buildkite: {
                         artifactPaths: [outfile],
-                        // plugins: {
-                        //     'junit-annotate#v2.6.0': {
-                        //         artifacts: 'bun-test.junit.xml',
-                        //     },
-                        // },
+                        plugins: {
+                            './.buildkite/plugins/junit-postprocess-buildkite-plugin':
+                                {
+                                    'report-path': outfile,
+                                    'suite-name': reportName,
+                                },
+                        },
                     },
                 }
             )
