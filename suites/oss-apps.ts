@@ -29,6 +29,6 @@ export default installAndTest('oss applications', {
     undb: {
         repository: 'https://github.com/undb-io/undb',
         ref: 'develop',
-        test: steps.test.bun('test-undb'),
+        test: steps.test.bun('undb'),
     },
 })

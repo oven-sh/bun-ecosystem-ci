@@ -12,9 +12,11 @@ import suites from '../suites'
 import { pick, toSnakeCase } from './util'
 import { PipelineFactory } from './buildkite/render'
 import { renderSuite as renderSuiteAsBashScript } from './shell'
+import { processJUnitReport } from './xml'
 import { version } from '../package.json'
 
 const inheritEnvVarNames = ['PATH', 'CI', 'TTY', 'BUN_DEBUG_QUIET_LOGS', 'TERM']
+const { CI } = process.env
 
 export default function main(argv: string[]): void {
     const program = new Command().name('ecosystem-ci').version(version)
@@ -23,6 +25,7 @@ export default function main(argv: string[]): void {
         .createOption('-b, --bun <bun>', 'Path to bun executable')
         .default('bun')
 
+    // `bun start render [options]
     program
         .command('render')
         .alias('r')
@@ -82,6 +85,29 @@ export default function main(argv: string[]): void {
             }
         })
 
+    /// `bun start process-report --report <path> --suite <name> [options]`
+    program
+        .command('process-report')
+        .description('prepare a JUnit report (xml) for reporting to robobun')
+        .addOption(bunOpt)
+        .option('-r, --report <report>', 'Path to the report file')
+        .option('-s, --suite <name>', 'Display name of the test suite')
+        .action(async function processReport(cmd): Promise<void> {
+            const { report: reportPath, suite: suiteName } = cmd
+            if (!reportPath) program.error('Report file cannot be empty.')
+            if (!suiteName) program.error('Suite name cannot be empty.')
+
+            // todo: get version from `cmd.bun`?
+            const newReport = await processJUnitReport(reportPath, suiteName, {
+                bunVersion: Bun.version,
+                ciJobUrl: process.env.BUILDKITE_BUILD_URL,
+            })
+            await Bun.write(reportPath, newReport)
+            console.log(`Processed and saved report to '${reportPath}'`)
+        })
+
+    // `bun start [options]`
+    // `bun start test [options]`
     program
         .command('test', { isDefault: true })
         .alias('t')
@@ -111,7 +137,7 @@ async function renderSuites(
     options: RenderOptions
 ): Promise<void> {
     const ctx: Context = {
-        isLocal: true,
+        isLocal: !CI,
         bun: options.bun,
         runner: options.format,
         data: undefined,

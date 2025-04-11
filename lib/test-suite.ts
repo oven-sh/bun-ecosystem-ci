@@ -1,6 +1,7 @@
 import deepmerge from 'deepmerge'
 import type { Maybe } from './types'
 import { strict as assert } from 'node:assert'
+import { truthy } from '../src/util'
 
 /**
  * Test suites have similar checks over a bunch of cases. Each case normally
@@ -105,7 +106,9 @@ export namespace TestCase {
     export function from(name: string, testCase: Options): TestCase
     export function from(
         name: string,
-        stepsOrOptions: Options | Maybe<string | Step>[]
+        stepsOrOptions:
+            | Options
+            | Maybe<string | Step | Maybe<string | Step>[]>[]
     ): TestCase {
         const {
             steps,
@@ -120,21 +123,15 @@ export namespace TestCase {
         return {
             name,
             steps: steps
-                .filter(falsey)
-                .map(step =>
-                    typeof step === 'string' ? Step.from(step) : step
-                ),
+                .flat()
+                .filter(truthy)
+                .map(s => Step.from(s)),
             cwd,
             env,
             failing,
             skip,
         }
     }
-
-    /** Filter falsey values */
-    const falsey = <T>(
-        value: T
-    ): value is Exclude<T, undefined | null | false | 0 | ''> => Boolean(value)
 }
 
 export interface Step {
@@ -216,7 +213,7 @@ export namespace Step {
                       .trim()
                       .split('\n')
                       .map(s => s.trim())
-                      .filter(Boolean),
+                      .filter(truthy),
         }
     }
 

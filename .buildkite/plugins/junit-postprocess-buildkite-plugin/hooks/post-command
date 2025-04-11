@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+
+echo "pwd: $(pwd)"
+bun install
+bun postprocess-junit \
+    --report $BUILDKITE_PLUGIN_JUNIT_POSTPROCESS_REPORT_PATH \
+    --suite $BUILDKITE_PLUGIN_JUNIT_POSTPROCESS_SUITE_NAME
