@@ -25,8 +25,9 @@ export async function processJUnitReport(
             .then(hash => hash.trim())
     } catch (e) {
         let msg = 'Error getting commit hash'
-        if (e instanceof Bun.ShellError) {
-            msg += `: ${e.stderr.toString('utf8')}`
+        // should always be true, but checking just in case
+        if (e instanceof Error && 'stderr' in e) {
+            msg += `: ${(e as Bun.ShellError).stderr.toString('utf8')}`
         }
         // log error, but keep going
         console.error(msg)
