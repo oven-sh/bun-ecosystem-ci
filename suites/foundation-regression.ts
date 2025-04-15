@@ -13,6 +13,7 @@ export default installAndTest('foundation regression', {
         ref: 'master',
         test: `--bun run test`,
         failing: true,
+        timeout: 10_000, // should be more than enough once this suite stops hanging
         // some cases hang
         // skip: true,
         // test: 'test ./test/*.js',
