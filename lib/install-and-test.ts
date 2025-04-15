@@ -27,6 +27,13 @@ interface Package extends Pick<TestCase.Options, 'failing' | 'skip'> {
      */
     test?: string | string[] | StepFactory
     /**
+     * Timeout for the test step in milliseconds. No timeout by default.
+     *
+     * Timeouts are usually handled at the test case level, so this is usually
+     * unnecessary.
+     */
+    timeout?: number
+    /**
      * Environment variables to set **only** for the test step
      */
     testEnv?: Record<string, string | undefined>
@@ -76,7 +83,7 @@ export function installAndTest(
 ): EcosystemSuite {
     return function doInstallAndTest(ctx) {
         const { bun } = ctx
-        const defaultTestStep = `${bun} run test`
+        const defaultTestStep = `${bun} --bun run test`
 
         const tmpdir =
             ctx.isLocal && ctx.runner == 'bun'
@@ -210,6 +217,7 @@ export function installAndTest(
                             cwd: packageName,
                             env: testEnv,
                             key: 'run-tests',
+                            timeout: rest.timeout,
                         }),
                     ],
                 })

@@ -21,6 +21,12 @@ export default installAndTest('foundation regression', {
         //     './test/support/env.js',
         // ],
     },
+    'express/serve-static': {
+        repository: 'https://github.com/expressjs/serve-static',
+        ref: 'master',
+        test: '--bun run test',
+        timeout: 1000,
+    },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',
         test: steps.test.bun('test-fastify'),
