@@ -14,7 +14,7 @@ export default installAndTest('foundation regression', {
         test: `--bun run test`,
         failing: true,
         // some cases hang
-        skip: true,
+        // skip: true,
         // test: 'test ./test/*.js',
         // preload: [
         //     import.meta.require.resolve('@shim/mocha'),
@@ -87,5 +87,9 @@ export default installAndTest('foundation regression', {
         install: 'pnpm i',
         postinstall: ({ bun }) => `pnpm i && ${bun} run build`,
         skip: true, // relies on gh actions. TODO: polyfill w buildkite env vars
+    },
+    'image-size': {
+        repository: 'https://github.com/image-size/image-size',
+        test: 'test',
     },
 })
