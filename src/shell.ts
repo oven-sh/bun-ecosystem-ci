@@ -114,7 +114,7 @@ const withTimeout =
             }
             assert(timeout > 0)
             assert(lines.length > 0)
-            const cmdArg = lines.filter(truthy).join(' && ').trim();
+            const cmdArg = lines.filter(truthy).map(l => l.trim()).join('; ').trim();
             return [`timeout --verbose --kill-after=${msToS(timeout * 2)} ${msToS(timeout)} bash -c "${cmdArg}"`]
         }
 const msToS = (ms: number) => `${ms / 1000}s`
