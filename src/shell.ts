@@ -104,17 +104,23 @@ const withDir = (dir: string | undefined) =>
 const subshell = wrap('(', ')')
 const withTimeout =
     (timeout: Maybe<number>) =>
-        (lines: string[]): string[] => {
-            if (timeout == null || !lines.length) return lines
-            if (lines.length > 2 && lines[0] == '(' && lines.at(-1) == ')') {
-                let [_, ...rest] = lines
-                rest.pop();
-                if (!rest.length) return lines;
-                lines = rest;
-            }
-            assert(timeout > 0)
-            assert(lines.length > 0)
-            const cmdArg = lines.filter(truthy).map(l => l.trim()).join('; ').trim();
-            return [`timeout --verbose --kill-after=${msToS(timeout * 2)} ${msToS(timeout)} bash -c "${cmdArg}"`]
+    (lines: string[]): string[] => {
+        if (timeout == null || !lines.length) return lines
+        if (lines.length > 2 && lines[0] == '(' && lines.at(-1) == ')') {
+            let [_, ...rest] = lines
+            rest.pop()
+            if (!rest.length) return lines
+            lines = rest
         }
+        assert(timeout > 0)
+        assert(lines.length > 0)
+        const cmdArg = lines
+            .filter(truthy)
+            .map(l => l.trim())
+            .join('; ')
+            .trim()
+        return [
+            `timeout --verbose --kill-after=${msToS(timeout * 2)} ${msToS(timeout)} bash -c "${cmdArg}"`,
+        ]
+    }
 const msToS = (ms: number) => `${ms / 1000}s`
