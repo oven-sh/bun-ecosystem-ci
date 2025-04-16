@@ -223,20 +223,43 @@ async function runCase(testCase: TestCase): Promise<number> {
             stepEnv
         )
         assert(run.length > 0, 'Step must have at least one command')
-        console.log('Step: ' + (name || `$ ${run[0]}`))
-        const child = Bun.spawn(['bash'], {
+        const stepName = name || `$ ${run[0]}`
+        console.log('Step: ' + stepName)
+        const spawnOpts: Bun.SpawnOptions.OptionsObject<
+            'pipe',
+            'inherit',
+            'inherit'
+        > = {
             stdio: ['pipe', 'inherit', 'inherit'],
             cwd,
             env,
-            timeout,
-        })
+        }
+
+        let timer: NodeJS.Timeout | undefined
+        let didTimeout = false
+        if (timeout && timeout > 0) {
+            const ctl = new AbortController()
+            const { signal } = ctl
+            spawnOpts.signal = signal
+            timer = setTimeout(() => {
+                console.error(`Step '${stepName}' timed out after ${timeout}ms`)
+                didTimeout = true
+                timer = undefined
+                ctl.abort()
+            }, timeout)
+        }
+
+        const child = Bun.spawn(['bash'], spawnOpts)
         for (const cmd of run) {
             child.stdin.write(cmd + '\n')
         }
         child.stdin.end()
 
         const code = await child.exited
-        if (code !== 0) {
+        if (timer) clearTimeout(timer)
+        if (didTimeout) {
+            return 1
+        } else if (code !== 0) {
             return code
         }
     }

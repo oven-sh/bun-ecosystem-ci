@@ -13,6 +13,7 @@ export default installAndTest('foundation regression', {
         ref: 'master',
         test: `--bun run test`,
         failing: true,
+        timeout: 10_000, // should be more than enough once this suite stops hanging
         // some cases hang
         // skip: true,
         // test: 'test ./test/*.js',
@@ -20,6 +21,12 @@ export default installAndTest('foundation regression', {
         //     import.meta.require.resolve('@shim/mocha'),
         //     './test/support/env.js',
         // ],
+    },
+    'express/serve-static': {
+        repository: 'https://github.com/expressjs/serve-static',
+        ref: 'master',
+        test: '--bun run test',
+        timeout: 1000,
     },
     fastify: {
         repository: 'https://github.com/fastify/fastify.git',

@@ -122,6 +122,6 @@ describe(renderStep, () => {
         expect(actual).not.toBeEmpty()
         const rendered = actual.join('\n')
         expect(rendered).toMatchSnapshot()
-        expect(rendered).toMatch(/timeout.*1000/)
+        expect(rendered).toMatch(/timeout.*2s 1s/)
     })
 })

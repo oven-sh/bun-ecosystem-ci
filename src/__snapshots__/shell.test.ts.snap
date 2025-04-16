@@ -2,7 +2,5 @@
 
 exports[`renderStep respects \`step.timeout\` 1`] = `
 "# Step: echo "hello world"
-timeout --verbose --kill-after=2000 1000 (
-  echo "hello world"
-)"
+timeout --verbose --kill-after=2s 1s bash -c "echo "hello world"""
 `;
