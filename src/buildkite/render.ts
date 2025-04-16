@@ -105,7 +105,7 @@ ${scriptLines.join('\n')}
                 (acc, el) => deepmerge(acc, el),
                 {} as Step.BuildkiteOptions
             )
-        const testKey = `${testCase.name}-test`
+        const testKey = `${testCase.name.replaceAll('/', '-')}-test`
         const testSteps: PurpleStep[] = [
             {
                 label,
