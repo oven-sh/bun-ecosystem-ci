@@ -73,6 +73,12 @@ export class PipelineFactory {
                     'junit-annotate#v2.6.0': {
                         artifacts: '*.junit.xml',
                     },
+                    'test-collector#v1.0.0': {
+                        files: '*.junit.xml',
+                        format: "junit",
+                        'missing-error': 0,
+                        'api-token-env-name': 'ECOSYSTEM_TEST_API_TOKEN',
+                    }
                 },
             }
         )
